@@ -1,0 +1,16 @@
+# Environments
+venv/
+env/
+.env
+
+# Byte-compiled / optimized / DLL files (Python's compiled cache)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database (if you use local SQLite for testing)
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
