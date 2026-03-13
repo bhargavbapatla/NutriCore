@@ -1,60 +1,181 @@
 import React, { useEffect, useRef } from 'react';
-import Navbar from './Navbar';
 import Hero from './Hero';
 import Features from './Features';
-import { motion } from 'framer-motion';
-import { Activity, ArrowRight } from 'lucide-react';
+import { ArrowRight, MoveRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import Navbar from './Navbar';
+import { useTheme } from '../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ─── Agents data ──────────────────────────────────────────────────────────────
+// Colors are resolved inside the component where useTheme() is available
+const AGENT_DEFS = [
+  {
+    num: '01', name: 'NutritionAgent', role: 'Food Intelligence',
+    desc: 'Identifies Indian dishes from photos using LLaVA vision. Maps every ingredient to IFCT 2017 — 1,000+ foods, full macro and micro breakdown down to B12 and calcium.',
+    accentKey: 'gold' as const,
+    tintKey: 'goldTint' as const,
+    borderKey: 'goldBorder' as const,
+    tag: 'LLaVA Vision · IFCT RAG · Qdrant',
+  },
+  {
+    num: '02', name: 'FitnessAgent', role: 'Activity Sync',
+    desc: 'Pulls live data from Strava and Google Fit via OAuth2. Recalculates your daily calorie ceiling based on workout intensity, heart rate zones, and MET values.',
+    accentKey: 'sage' as const,
+    tintKey: 'sageTint' as const,
+    borderKey: 'sageBorder' as const,
+    tag: 'Strava · Google Fit · OAuth2',
+  },
+  {
+    num: '03', name: 'CheatDayAgent', role: 'Weekend Intelligence',
+    desc: 'The only agent of its kind. Tracks your weekly deficit and workout streak, then produces a mathematically justified cheat budget — in samosas, biryani, chai.',
+    accentKey: 'gold' as const,
+    tintKey: 'goldTint' as const,
+    borderKey: 'goldBorder' as const,
+    tag: 'Deficit Tracking · Indian Junk DB',
+  },
+  {
+    num: '04', name: 'DeficiencyAgent', role: 'Micronutrient Watchdog',
+    desc: 'Flags silent gaps before they compound. Cross-references your daily logs against bloodwork PDFs and cites PubMed abstracts with every alert. Never a guess.',
+    accentKey: 'sage' as const,
+    tintKey: 'sageTint' as const,
+    borderKey: 'sageBorder' as const,
+    tag: 'PubMed RAG · PyMuPDF · Alerts',
+  },
+  {
+    num: '05', name: 'DiabetesAgent', role: 'Glycaemic Control',
+    desc: 'Only activates for prediabetic and diabetic users. Scores every meal by GI and GL, correlates with CGM glucose readings, tracks HbA1c against ICMR guidelines.',
+    accentKey: 'rose' as const,
+    tintKey: 'roseTint' as const,
+    borderKey: 'roseBorder' as const,
+    tag: 'GI/GL · CGM · HbA1c · ICMR',
+  },
+  {
+    num: '06', name: 'PlannerAgent', role: 'Orchestrator',
+    desc: 'Always runs last. Reads the full shared state from every agent and synthesises it into one coherent, personalised recommendation. The voice you actually talk to.',
+    accentKey: 'gold' as const,
+    tintKey: 'goldTint' as const,
+    borderKey: 'goldBorder' as const,
+    tag: 'LangGraph · Conversation Memory',
+  },
+];
+
+// ─── ECG Logo ─────────────────────────────────────────────────────────────────
+const ECGLogo: React.FC = () => {
+  const { colors } = useTheme();
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 9,
+      fontWeight: 900, fontSize: '1.1rem',
+      color: colors.textPrimary,
+      letterSpacing: '0.08em',
+      fontFamily: "'DM Mono', monospace",
+    }}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ overflow: 'visible' }}>
+        <polyline
+          points="1,12 5,12 7,6 9,18 11,4 13,20 15,8 17,12 23,12"
+          stroke={colors.gold} strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round"
+          strokeDasharray="60" strokeDashoffset="60"
+        >
+          <animate attributeName="stroke-dashoffset" from="60" to="-60" dur="1.8s" repeatCount="indefinite" />
+        </polyline>
+      </svg>
+      NUTRICORE
+    </div>
+  );
+};
+
+// ─── LandingPage ──────────────────────────────────────────────────────────────
 const LandingPage: React.FC = () => {
+  const { colors } = useTheme();
   const containerRef = useRef<HTMLDivElement>(null);
+  const agentsPinRef = useRef<HTMLDivElement>(null);
+  const agentsTrackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 1. Lenis Smooth Scrolling
+    // ── Lenis smooth scroll ──────────────────────────────────────────────────
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 1.4,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
+      wheelMultiplier: 0.9,
+      touchMultiplier: 1.5,
     });
 
+    // Correct Lenis + GSAP integration — eliminates scroll lag
     lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
-    gsap.ticker.lagSmoothing(0);
+    const onFrame = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(onFrame);
+    gsap.ticker.lagSmoothing(0); // critical — prevents GSAP internal lag accumulation
 
-    // 2. Safe GSAP Animations
     const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray<HTMLElement>('.fade-up-section');
 
-      sections.forEach((section) => {
-        gsap.set(section, { autoAlpha: 0, y: 80, scale: 0.98 });
-
-        gsap.to(section, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.2,
-          ease: "expo.out",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 85%",
-            toggleActions: "play none none reverse",
+      // Generic fade-up for all .fade-up-section elements
+      gsap.utils.toArray<HTMLElement>('.fade-up-section').forEach((el) => {
+        gsap.fromTo(el,
+          { autoAlpha: 0, y: 48 },
+          {
+            autoAlpha: 1, y: 0,
+            duration: 1.0, ease: 'expo.out',
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
           }
-        });
+        );
       });
 
-      setTimeout(() => ScrollTrigger.refresh(), 500);
+      // ── GSAP horizontal pinned scroll for agents section ──────────────────
+      if (agentsPinRef.current && agentsTrackRef.current) {
+        const track = agentsTrackRef.current;
+
+        // Derive scroll distance on each resize (invalidateOnRefresh handles it)
+        const getScrollDist = () => track.scrollWidth - window.innerWidth;
+
+        // Pin the section and scrub the horizontal translation
+        gsap.to(track, {
+          x: () => -getScrollDist(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: agentsPinRef.current,
+            start: 'top top',
+            end: () => `+=${getScrollDist() + window.innerWidth * 0.4}`,
+            pin: true,
+            scrub: 1.0,          // smoothing factor — higher = more lag behind scroll
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+
+        // Scrub the gold progress bar width
+        gsap.to('.agents-progress', {
+          scaleX: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: agentsPinRef.current,
+            start: 'top top',
+            end: () => `+=${getScrollDist() + window.innerWidth * 0.4}`,
+            scrub: true,
+          },
+        });
+      }
+
     }, containerRef);
 
+    const refreshTimer = setTimeout(() => ScrollTrigger.refresh(), 500);
+
     return () => {
+      clearTimeout(refreshTimer);
       ctx.revert();
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
+      gsap.ticker.remove(onFrame);
     };
   }, []);
 
@@ -63,106 +184,462 @@ const LandingPage: React.FC = () => {
       ref={containerRef}
       style={{
         minHeight: '100vh',
-        color: '#ffffff',
+        color: colors.textPrimary,
         overflowX: 'hidden',
-        position: 'relative',
-        /* CRITICAL FIX: Background applied directly to the main container, overwriting any white defaults */
-        background: 'radial-gradient(circle at 50% 0%, #0a1128 0%, #020308 50%, #000000 100%)',
-        backgroundColor: '#020308' // Fallback
+        background: colors.bgPage,
+        fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif",
       }}
     >
-      <style>
-        {`
-          ::-webkit-scrollbar { display: none; }
-          * { -ms-overflow-style: none; scrollbar-width: none; }
-          html.lenis, html.lenis body { height: auto; }
-          .lenis.lenis-smooth { scroll-behavior: auto !important; }
-          .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
-          .lenis.lenis-stopped { overflow: hidden; }
-        `}
-      </style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,700;9..40,900&family=DM+Mono:wght@400;500&display=swap');
 
-      {/* BACKGROUND CIRCUITS - Fixed to zIndex 0 so it stays above the dark background but below content */}
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
-          <defs>
-            <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#22d3ee" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
-            </linearGradient>
-            <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#d946ef" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
-            </linearGradient>
-          </defs>
-          <motion.path d="M -50 200 C 200 200, 400 450, 720 450" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-          <motion.path d="M -50 750 C 300 750, 500 550, 720 550" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-          <motion.path d="M 1490 150 C 1200 150, 1000 450, 720 450" fill="transparent" stroke="url(#glowRight)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
-          <motion.path d="M 1490 800 C 1100 800, 900 550, 720 550" fill="transparent" stroke="url(#glowRight)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
-        </svg>
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; box-sizing: border-box; }
+        html.lenis, html.lenis body { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-stopped { overflow: hidden; }
+
+        .agent-card { will-change: transform, opacity; }
+        .agent-card:hover { background: ${colors.bgElevated} !important; }
+
+        .nav-link:hover { color: ${colors.gold} !important; }
+
+        .cta-primary:hover {
+          background: ${colors.goldLight} !important;
+          transform: translateY(-2px);
+          box-shadow: 0 16px 40px rgba(232,184,109,0.22);
+        }
+        .cta-primary:active { transform: scale(0.97) !important; }
+
+        .footer-link:hover { color: ${colors.textBody} !important; }
+        .stat-pill:hover { border-color: ${colors.goldBorder} !important; }
+      `}</style>
+
+      {/* ── Fixed ambient atmosphere ────────────────────────────────────────── */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        {/* Warm amber bloom — top center */}
+        <div style={{
+          position: 'absolute', top: '-15%', left: '50%', transform: 'translateX(-50%)',
+          width: '70vw', height: '50vh',
+          background: 'radial-gradient(ellipse, rgba(232,184,109,0.065) 0%, transparent 65%)',
+        }} />
+        {/* Sage — bottom left */}
+        <div style={{
+          position: 'absolute', bottom: '-10%', left: '-5%',
+          width: '45vw', height: '40vh',
+          background: 'radial-gradient(ellipse, rgba(126,184,154,0.05) 0%, transparent 65%)',
+        }} />
+        {/* Rose — top right */}
+        <div style={{
+          position: 'absolute', top: '30%', right: '-5%',
+          width: '35vw', height: '35vh',
+          background: 'radial-gradient(ellipse, rgba(196,122,122,0.04) 0%, transparent 65%)',
+        }} />
+        {/* Subtle grid */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `
+            linear-gradient(rgba(255,248,235,0.018) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,248,235,0.018) 1px, transparent 1px)
+          `,
+          backgroundSize: '80px 80px',
+        }} />
       </div>
 
-      <Navbar />
+      {/* ── Sticky nav ──────────────────────────────────────────────────────── */}
+      <header style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+        padding: '1.2rem 5%',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        background: `${colors.bgPage}cc`,  // 80% opacity of bgPage
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: `0.5px solid ${colors.borderSubtle}`,
+      }}>
+        <ECGLogo />
+        <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
+          {['Features', 'Agents', 'Pricing'].map(label => (
+            <a key={label} href="#" className="nav-link" style={{
+              color: colors.textMuted, textDecoration: 'none',
+              fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.04em',
+              transition: 'color 0.2s',
+            }}>{label}</a>
+          ))}
+          <a href="/signup" style={{
+            background: colors.goldTint,
+            border: `0.5px solid ${colors.goldBorder}`,
+            color: colors.gold,
+            padding: '8px 20px', borderRadius: 999,
+            fontSize: '0.75rem', fontWeight: 700,
+            textDecoration: 'none', letterSpacing: '0.06em',
+            transition: 'background 0.2s',
+          }}
+            onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.background = colors.goldGlow)}
+            onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.background = colors.goldTint)}
+          >
+            Get Access
+          </a>
+        </nav>
+      </header>
 
-      {/* Main Container */}
-      <main style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
+      {/* ── Page content ────────────────────────────────────────────────────── */}
+      <main style={{ position: 'relative', zIndex: 10, paddingTop: '5rem' }}>
 
-        {/* Your Hero should be transparent so it shows the dark gradient from the wrapper */}
         <Hero />
 
+        {/* ── Stats bar ── */}
+        <section className="fade-up-section" style={{ padding: '0 5% 6rem' }}>
+          <div style={{
+            background: colors.bgCard,
+            border: `0.5px solid ${colors.borderDefault}`,
+            borderRadius: 18,
+            padding: '1.75rem 3rem',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1rem',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            {/* Vertical dividers */}
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{
+                position: 'absolute',
+                left: `${i * 25}%`, top: '18%', bottom: '18%',
+                width: '0.5px', background: colors.borderSubtle,
+              }} />
+            ))}
+            {[
+              { v: '14,000+', l: 'Indian foods tracked' },
+              { v: '6 agents', l: 'Working in parallel' },
+              { v: '< 2s', l: 'Photo to nutrition' },
+              { v: '98.2%', l: 'Accuracy rate' },
+            ].map(s => (
+              <div key={s.l} style={{ textAlign: 'center' }}>
+                <div style={{
+                  fontSize: 'clamp(1.3rem,2.2vw,1.9rem)',
+                  fontWeight: 900, color: colors.gold,
+                  letterSpacing: '-0.03em',
+                  fontFamily: "'DM Mono', monospace",
+                }}>{s.v}</div>
+                <div style={{
+                  fontSize: '0.67rem', color: colors.textMuted,
+                  fontWeight: 500, textTransform: 'uppercase',
+                  letterSpacing: '0.12em', marginTop: 5,
+                }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Features (your existing component) ── */}
         <div className="fade-up-section">
           <Features />
         </div>
 
-        {/* --- BULLETPROOF CTA SECTION --- */}
-        <section className="fade-up-section" style={{ padding: '8rem 5%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+        {/* ════════════════════════════════════════════════════════════════════
+            AGENTS — GSAP HORIZONTAL PINNED SCROLL
+        ════════════════════════════════════════════════════════════════════ */}
+        <section
+          ref={agentsPinRef}
+          style={{
+            height: '100vh',
+            overflow: 'hidden',
+            position: 'relative',
+            background: colors.bgPage,
+          }}
+        >
+          {/* Section header — stays visible while pinned */}
           <div style={{
-            width: '100%', maxWidth: '900px', padding: '5rem 2rem',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem', textAlign: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: '40px', border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+            position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20,
+            padding: '2.5rem 5% 0',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
           }}>
-            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-              Ready to Upgrade Your Biology?
+            <div>
+              <div style={{
+                fontSize: '0.6rem', fontWeight: 700, color: colors.gold,
+                letterSpacing: '0.22em', textTransform: 'uppercase',
+                marginBottom: 10, fontFamily: "'DM Mono', monospace",
+              }}>
+                The Architecture
+              </div>
+              <h2 style={{
+                fontSize: 'clamp(1.9rem,3vw,2.75rem)', fontWeight: 900,
+                color: colors.textPrimary, letterSpacing: '-0.03em',
+                lineHeight: 1.1, margin: 0,
+              }}>
+                Six agents.<br />
+                <span style={{ color: colors.gold }}>One shared brain.</span>
+              </h2>
+            </div>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              color: colors.textMuted, fontSize: '0.7rem', fontWeight: 500,
+              paddingBottom: 6,
+            }}>
+              <span style={{ letterSpacing: '0.05em' }}>Scroll to explore</span>
+              <MoveRight size={13} color={colors.gold} />
+            </div>
+          </div>
+
+          {/* Gold progress line at bottom of pinned section */}
+          <div style={{
+            position: 'absolute', bottom: '2.5rem', left: '5%', right: '5%',
+            zIndex: 20, height: '0.5px', background: colors.borderSubtle,
+          }}>
+            <div
+              className="agents-progress"
+              style={{
+                height: '100%', background: colors.gold,
+                transformOrigin: 'left center', transform: 'scaleX(0)',
+              }}
+            />
+          </div>
+
+          {/* Horizontal scrolling track */}
+          <div
+            ref={agentsTrackRef}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1.25rem',
+              paddingLeft: '5%',
+              paddingRight: '10%',
+              height: '100%',
+              willChange: 'transform',
+            }}
+          >
+            {/* Lead-in text block */}
+            <div style={{ flexShrink: 0, width: 'clamp(260px,26vw,360px)', marginTop: '5rem' }}>
+              <p style={{
+                fontSize: '0.98rem', color: colors.textBody,
+                lineHeight: 1.8, maxWidth: 300, margin: '0 0 1.5rem',
+              }}>
+                NutriCore runs a{' '}
+                <span style={{ color: colors.textPrimary, fontWeight: 700 }}>LangGraph state machine</span>
+                {' '}where agents share context and conditionally activate based on your data, your day, and your health profile.
+              </p>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                <div style={{ width: 28, height: 0.5, background: colors.goldDim }} />
+                <span style={{
+                  fontSize: '0.62rem', color: colors.textMuted,
+                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                  fontFamily: "'DM Mono', monospace",
+                }}>
+                  LangGraph · Llama 3.1 · Ollama
+                </span>
+              </div>
+            </div>
+
+            {/* Agent cards */}
+            {AGENT_DEFS.map((agent, i) => {
+              const accent = colors[agent.accentKey];
+              const tint = colors[agent.tintKey];
+              const border = colors[agent.borderKey];
+
+              return (
+                <div
+                  key={agent.name}
+                  className="agent-card"
+                  style={{
+                    flexShrink: 0,
+                    width: 'clamp(290px,29vw,380px)',
+                    height: 'clamp(330px,42vh,420px)',
+                    background: colors.bgCard,
+                    border: `0.5px solid ${colors.borderDefault}`,
+                    borderRadius: 22,
+                    padding: '1.75rem 2rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    // Staggered vertical offset — creates diagonal wave layout
+                    marginTop: i % 2 === 0 ? '5rem' : '9rem',
+                    transition: 'border-color 0.22s, background 0.22s',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLDivElement;
+                    el.style.borderColor = border;
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLDivElement;
+                    el.style.borderColor = colors.borderDefault;
+                  }}
+                >
+                  {/* Watermark number behind content */}
+                  <div style={{
+                    position: 'absolute', bottom: '-0.5rem', right: '0.75rem',
+                    fontSize: '6.5rem', fontWeight: 900, color: accent,
+                    opacity: 0.05, lineHeight: 1,
+                    fontFamily: "'DM Mono', monospace",
+                    userSelect: 'none', pointerEvents: 'none',
+                  }}>
+                    {agent.num}
+                  </div>
+
+                  {/* Card body */}
+                  <div>
+                    <div style={{
+                      display: 'flex', justifyContent: 'space-between',
+                      alignItems: 'flex-start', marginBottom: '1.25rem',
+                    }}>
+                      <span style={{
+                        fontSize: '0.6rem', fontWeight: 700, color: accent,
+                        letterSpacing: '0.16em', textTransform: 'uppercase',
+                        background: tint, border: `0.5px solid ${border}`,
+                        padding: '4px 11px', borderRadius: 999,
+                        fontFamily: "'DM Mono', monospace",
+                      }}>
+                        {agent.num}
+                      </span>
+                      <span style={{
+                        fontSize: '0.58rem', fontWeight: 600, color: colors.textMuted,
+                        letterSpacing: '0.1em', textTransform: 'uppercase',
+                        fontFamily: "'DM Mono', monospace",
+                      }}>
+                        {agent.role}
+                      </span>
+                    </div>
+
+                    <h3 style={{
+                      fontSize: '1.2rem', fontWeight: 900,
+                      color: colors.textPrimary, letterSpacing: '-0.02em',
+                      margin: '0 0 0.7rem',
+                    }}>
+                      {agent.name}
+                    </h3>
+
+                    <p style={{
+                      fontSize: '0.82rem', color: colors.textBody,
+                      lineHeight: 1.7, margin: 0,
+                    }}>
+                      {agent.desc}
+                    </p>
+                  </div>
+
+                  {/* Tech stack tag */}
+                  <div style={{
+                    fontSize: '0.6rem', color: colors.textMuted,
+                    fontFamily: "'DM Mono', monospace",
+                    letterSpacing: '0.08em',
+                    borderTop: `0.5px solid ${colors.borderSubtle}`,
+                    paddingTop: '0.9rem', marginTop: '0.9rem',
+                  }}>
+                    {agent.tag}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* End padding so last card can fully scroll into view */}
+            <div style={{ flexShrink: 0, width: '8vw' }} />
+          </div>
+        </section>
+
+        {/* ── CTA ──────────────────────────────────────────────────────────── */}
+        <section className="fade-up-section" style={{
+          padding: '8rem 5%',
+          display: 'flex', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: '100%', maxWidth: 780,
+            background: colors.bgCard,
+            border: `0.5px solid ${colors.borderDefault}`,
+            borderRadius: 30,
+            padding: 'clamp(3rem,6vw,5rem) clamp(2rem,5vw,4rem)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: '1.5rem',
+            textAlign: 'center',
+            position: 'relative', overflow: 'hidden',
+          }}>
+            {/* Warm glow bloom */}
+            <div style={{
+              position: 'absolute', top: -50, left: '50%', transform: 'translateX(-50%)',
+              width: '55%', height: 160,
+              background: 'radial-gradient(ellipse, rgba(232,184,109,0.09) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }} />
+
+            <span style={{
+              fontSize: '0.6rem', fontWeight: 700, color: colors.gold,
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              background: colors.goldTint, border: `0.5px solid ${colors.goldBorder}`,
+              padding: '5px 16px', borderRadius: 999,
+              fontFamily: "'DM Mono', monospace",
+            }}>
+              Free for 30 days
+            </span>
+
+            <h2 style={{
+              fontSize: 'clamp(2rem,4vw,3.1rem)', fontWeight: 900, margin: 0,
+              color: colors.textPrimary, letterSpacing: '-0.03em', lineHeight: 1.1,
+            }}>
+              Precision nutrition.<br />
+              <span style={{ color: colors.gold }}>Built for Indian bodies.</span>
             </h2>
-            <p style={{ fontSize: '1.25rem', color: '#a0aabf', margin: 0, maxWidth: '600px', lineHeight: 1.6 }}>
-              Join the elite group of individuals leveraging deep data for superior health and cognition.
+
+            <p style={{
+              fontSize: '0.98rem', color: colors.textBody,
+              margin: 0, maxWidth: 460, lineHeight: 1.8,
+            }}>
+              Six AI agents. Your complete food history. Real-time fitness sync. Designed from the ground up for Indian food culture — not retrofitted from a Western app.
             </p>
-            <motion.button
+
+            <button
+              className="cta-primary"
               onClick={() => window.location.href = '/signup'}
               style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                padding: '16px 40px', borderRadius: '9999px', marginTop: '1rem',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
-                cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '14px 36px', borderRadius: 999, marginTop: 8,
+                background: colors.gold, border: 'none',
+                color: colors.bgPage,
+                fontSize: '0.76rem', fontWeight: 800,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+                cursor: 'pointer',
+                transition: 'background 0.18s, transform 0.15s, box-shadow 0.18s',
               }}
-              whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(0px)', borderColor: 'rgba(34, 211, 238, 0.8)', y: -2 }}
-              transition={{ duration: 0.2 }}
             >
-              Initialize Setup Access
-              <ArrowRight size={18} color="#22d3ee" />
-            </motion.button>
+              Initialize Setup <ArrowRight size={14} />
+            </button>
+
+            <p style={{
+              fontSize: '0.68rem', color: colors.textMuted, margin: 0, letterSpacing: '0.04em',
+            }}>
+              No credit card required
+            </p>
           </div>
         </section>
       </main>
 
-      <footer
-        className="fade-up-section"
-        style={{
-          position: 'relative', zIndex: 10, padding: '4rem 5%',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)', backgroundColor: '#020308',
-          display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.25rem', color: 'white' }}>
-          <Activity size={24} color="#22d3ee" />
-          NutriCore
+      {/* ── Footer ───────────────────────────────────────────────────────────── */}
+      <footer style={{
+        position: 'relative', zIndex: 10,
+        padding: '2.5rem 5%',
+        borderTop: `0.5px solid ${colors.borderSubtle}`,
+        background: `${colors.bgPage}e6`,  // 90% opacity
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        flexWrap: 'wrap', gap: '1.5rem',
+      }}>
+        <ECGLogo />
+
+        <div style={{ display: 'flex', gap: '2.5rem' }}>
+          {['Privacy', 'Terms', 'Contact'].map(label => (
+            <a key={label} href="#" className="footer-link" style={{
+              color: colors.textMuted, textDecoration: 'none',
+              fontSize: '0.66rem', fontWeight: 600,
+              textTransform: 'uppercase', letterSpacing: '0.12em',
+              transition: 'color 0.2s',
+            }}>
+              {label}
+            </a>
+          ))}
         </div>
-        <div style={{ display: 'flex', gap: '2rem' }}>
-          <a href="#" style={{ color: '#a0aabf', textDecoration: 'none', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Privacy Protocol</a>
-          <a href="#" style={{ color: '#a0aabf', textDecoration: 'none', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Terms of Service</a>
-        </div>
-        <div style={{ color: '#64748b', fontSize: '0.65rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
-          &copy; {new Date().getFullYear()} NutriCore Systems. Secure Link Established.
+
+        <div style={{
+          color: colors.textMuted, fontSize: '0.64rem',
+          letterSpacing: '0.1em',
+          fontFamily: "'DM Mono', monospace",
+        }}>
+          © {new Date().getFullYear()} NutriCore Systems
         </div>
       </footer>
     </div>

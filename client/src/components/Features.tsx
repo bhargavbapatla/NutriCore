@@ -8,6 +8,7 @@ import {
   Zap,
   ShieldCheck
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 // --- ANIMATION VARIANTS ---
 const containerVariants = {
@@ -25,45 +26,64 @@ const cardVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: "easeOut" }
+    transition: { duration: 0.8, ease: "easeOut" as any }
   }
 };
 
-const featuresList = [
-  {
-    icon: <Dna size={28} color="#22d3ee" />,
-    title: "Genome Mapping",
-    description: "Proprietary CRISPR-base sequencing to analyze your unique metabolic blueprint."
-  },
-  {
-    icon: <Brain size={28} color="#22d3ee" />,
-    title: "Neural Synergy",
-    description: "Cognitive performance optimization via amino-acid and neurotransmitter balancing."
-  },
-  {
-    icon: <Zap size={28} color="#22d3ee" />,
-    title: "Cellular Energy",
-    description: "Mitochondrial enhancement protocols designed to eliminate chronic fatigue."
-  },
-  {
-    icon: <Target size={28} color="#22d3ee" />,
-    title: "Precision Macro",
-    description: "Dynamic micro-nutrient adjustments based on real-time biometric feedback loops."
-  },
-  {
-    icon: <Heart size={28} color="#22d3ee" />,
-    title: "Longevity Bio",
-    description: "Advanced anti-aging protocols rooted in telomere protection and sirtuin activation."
-  },
-  {
-    icon: <ShieldCheck size={28} color="#22d3ee" />,
-    title: "Immune Shield",
-    description: "Fortify your natural defenses through data-driven immunological resilience training."
-  }
-];
-
 const Features: React.FC = () => {
+  const { colors } = useTheme();
   const containerRef = useRef<HTMLElement>(null);
+
+  const featuresList = [
+    {
+      icon: <Dna size={28} color={colors.gold} />,
+      title: "Genome Mapping",
+      description: "Proprietary CRISPR-base sequencing to analyze your unique metabolic blueprint.",
+      accent: colors.gold,
+      tint: colors.goldTint,
+      border: colors.goldBorder
+    },
+    {
+      icon: <Brain size={28} color={colors.sage} />,
+      title: "Neural Synergy",
+      description: "Cognitive performance optimization via amino-acid and neurotransmitter balancing.",
+      accent: colors.sage,
+      tint: colors.sageTint,
+      border: colors.sageBorder
+    },
+    {
+      icon: <Zap size={28} color={colors.gold} />,
+      title: "Cellular Energy",
+      description: "Mitochondrial enhancement protocols designed to eliminate chronic fatigue.",
+      accent: colors.gold,
+      tint: colors.goldTint,
+      border: colors.goldBorder
+    },
+    {
+      icon: <Target size={28} color={colors.sage} />,
+      title: "Precision Macro",
+      description: "Dynamic micro-nutrient adjustments based on real-time biometric feedback loops.",
+      accent: colors.sage,
+      tint: colors.sageTint,
+      border: colors.sageBorder
+    },
+    {
+      icon: <Heart size={28} color={colors.rose} />,
+      title: "Longevity Bio",
+      description: "Advanced anti-aging protocols rooted in telomere protection and sirtuin activation.",
+      accent: colors.rose,
+      tint: colors.roseTint,
+      border: colors.roseBorder
+    },
+    {
+      icon: <ShieldCheck size={28} color={colors.sage} />,
+      title: "Immune Shield",
+      description: "Fortify your natural defenses through data-driven immunological resilience training.",
+      accent: colors.sage,
+      tint: colors.sageTint,
+      border: colors.sageBorder
+    }
+  ];
 
   return (
     <section
@@ -86,7 +106,7 @@ const Features: React.FC = () => {
           style={{
             fontSize: 'clamp(2.5rem, 6vw, 4rem)',
             fontWeight: 900,
-            color: '#ffffff',
+            color: colors.textPrimary,
             textTransform: 'uppercase',
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
@@ -103,7 +123,7 @@ const Features: React.FC = () => {
           viewport={{ once: true, margin: "-50px" }}
           style={{
             fontSize: '1.25rem',
-            color: '#a0aabf',
+            color: colors.textBody,
             fontWeight: 500,
             lineHeight: 1.6
           }}
@@ -112,8 +132,7 @@ const Features: React.FC = () => {
         </motion.p>
       </div>
 
-      {/* --- FOOLPROOF FEATURE GRID --- */}
-      {/* Using auto-fill ensures it mathematically locks into columns based on screen width, independent of Tailwind */}
+      {/* --- FEATURE GRID --- */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -134,8 +153,8 @@ const Features: React.FC = () => {
             variants={cardVariants}
             whileHover={{
               y: -8,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              borderColor: 'rgba(34, 211, 238, 0.4)',
+              backgroundColor: colors.bgElevated,
+              borderColor: feat.accent,
               boxShadow: '0 20px 40px -15px rgba(0,0,0,0.5)'
             }}
             style={{
@@ -145,9 +164,9 @@ const Features: React.FC = () => {
               alignItems: 'flex-start',
               gap: '1.5rem',
               padding: '2.5rem',
-              borderRadius: '2rem', /* Matches the 2rem radius from your UI */
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '2rem',
+              backgroundColor: colors.bgCard,
+              border: `1px solid ${colors.borderDefault}`,
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
               cursor: 'default',
@@ -159,11 +178,11 @@ const Features: React.FC = () => {
               width: '64px',
               height: '64px',
               borderRadius: '16px',
-              backgroundColor: 'rgba(34, 211, 238, 0.1)',
+              backgroundColor: feat.tint,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid rgba(34, 211, 238, 0.2)',
+              border: `1px solid ${feat.border}`,
               transition: 'transform 0.5s ease, background-color 0.5s ease'
             }}>
               {feat.icon}
@@ -171,10 +190,10 @@ const Features: React.FC = () => {
 
             {/* Text Content */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', margin: 0, letterSpacing: '-0.02em' }}>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: colors.textPrimary, margin: 0, letterSpacing: '-0.02em' }}>
                 {feat.title}
               </h3>
-              <p style={{ color: '#a0aabf', fontSize: '1.05rem', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ color: colors.textBody, fontSize: '1.05rem', lineHeight: 1.6, margin: 0 }}>
                 {feat.description}
               </p>
             </div>

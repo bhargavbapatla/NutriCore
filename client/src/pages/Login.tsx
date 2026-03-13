@@ -1,16 +1,57 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Activity, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Lock, Mail } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+
+const ECGIcon = ({ size = 24, color = "#e8b86d" }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ overflow: 'visible' }}
+  >
+    <polyline
+      points="1,12 5,12 7,6 9,18 11,4 13,20 15,8 17,12 23,12"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      strokeDasharray="60"
+      strokeDashoffset="60"
+    >
+      <animate
+        attributeName="stroke-dashoffset"
+        from="60"
+        to="-60"
+        dur="1.5s"
+        repeatCount="indefinite"
+        calcMode="linear"
+      />
+    </polyline>
+  </svg>
+);
 
 const Login: React.FC = () => {
+  const { colors } = useTheme();
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('isAuthenticated', 'true');
-    window.location.href = '/dashboard';
+    setIsLoading(true);
+
+    // Simulate API authentication delay
+    setTimeout(() => {
+      localStorage.setItem('isAuthenticated', 'true');
+      setIsLoading(false);
+      navigate('/questionnaire');
+    }, 2000);
   };
 
   return (
@@ -20,8 +61,9 @@ const Login: React.FC = () => {
       flexDirection: 'column',
       position: 'relative',
       overflow: 'hidden',
-      backgroundColor: '#020308',
-      color: '#ffffff'
+      backgroundColor: colors.bgPage,
+      color: colors.textPrimary,
+      fontFamily: "'DM Sans', sans-serif"
     }}>
 
       {/* --- INJECTED CSS FOR AUTOFILL RESET --- */}
@@ -32,30 +74,30 @@ const Login: React.FC = () => {
           input:-webkit-autofill:hover, 
           input:-webkit-autofill:focus, 
           input:-webkit-autofill:active{
-              -webkit-box-shadow: 0 0 0 30px #0a0e17 inset !important;
-              -webkit-text-fill-color: white !important;
+              -webkit-box-shadow: 0 0 0 30px ${colors.bgPage} inset !important;
+              -webkit-text-fill-color: ${colors.textPrimary} !important;
           }
         `}
       </style>
 
       {/* --- AMBIENT BACKGROUND GLOW --- */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: 'rgba(34, 211, 238, 0.05)', filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: 'rgba(217, 70, 239, 0.05)', filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.gold}0a`, filter: 'blur(100px)' }} />
+        <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.rose}0a`, filter: 'blur(100px)' }} />
       </div>
 
-      {/* --- INWARD FIRING NEURAL CIRCUITS (Replaced Helix) --- */}
+      {/* --- NEURAL CIRCUITS --- */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
         <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
           <defs>
             <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="transparent" />
-              <stop offset="20%" stopColor="#22d3ee" stopOpacity="0.8" />
+              <stop offset="20%" stopColor={colors.gold} stopOpacity="0.8" />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
             <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
               <stop offset="0%" stopColor="transparent" />
-              <stop offset="20%" stopColor="#d946ef" stopOpacity="0.8" />
+              <stop offset="20%" stopColor={colors.rose} stopOpacity="0.8" />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
           </defs>
@@ -72,11 +114,11 @@ const Login: React.FC = () => {
 
       {/* --- HEADER --- */}
       <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '2rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: 'white' }}>
-          <Activity size={24} color="#22d3ee" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em' }}>
+          <ECGIcon size={24} color={colors.gold} />
           NUTRICORE
         </div>
-        <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+        <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
           Return Home
         </Link>
       </header>
@@ -91,9 +133,9 @@ const Login: React.FC = () => {
             width: '100%',
             maxWidth: '440px',
             padding: '3rem',
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            backgroundColor: colors.bgCard,
             borderRadius: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: `1px solid ${colors.borderDefault}`,
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
@@ -104,10 +146,10 @@ const Login: React.FC = () => {
         >
           {/* Titles */}
           <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
-              Login Protocol
+            <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: colors.textPrimary }}>
+              Login
             </h1>
-            <p style={{ fontSize: '0.9rem', color: '#a0aabf', margin: 0 }}>
+            <p style={{ fontSize: '0.9rem', color: colors.textMuted, margin: 0 }}>
               Authenticate to access your bio-dashboard.
             </p>
           </div>
@@ -117,11 +159,11 @@ const Login: React.FC = () => {
 
             {/* Email Field */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
-                Email Identification
+              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
+                Email ID
               </label>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                   <Mail size={18} />
                 </div>
                 <input
@@ -130,10 +172,12 @@ const Login: React.FC = () => {
                   placeholder="user@neural-link.com"
                   onFocus={() => setEmailFocus(true)}
                   onBlur={() => setEmailFocus(false)}
+                  disabled={isLoading}
                   style={{
                     width: '100%', padding: '16px 16px 16px 48px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                    borderRadius: '12px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
+                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.goldBorder : colors.borderSubtle}`,
+                    borderRadius: '12px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease',
+                    opacity: isLoading ? 0.5 : 1
                   }}
                 />
               </div>
@@ -141,11 +185,11 @@ const Login: React.FC = () => {
 
             {/* Password Field */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
-                Security Key
+              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
+                Password
               </label>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                   <Lock size={18} />
                 </div>
                 <input
@@ -154,10 +198,12 @@ const Login: React.FC = () => {
                   placeholder="••••••••"
                   onFocus={() => setPassFocus(true)}
                   onBlur={() => setPassFocus(false)}
+                  disabled={isLoading}
                   style={{
                     width: '100%', padding: '16px 16px 16px 48px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                    borderRadius: '12px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.2em'
+                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.goldBorder : colors.borderSubtle}`,
+                    borderRadius: '12px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.2em',
+                    opacity: isLoading ? 0.5 : 1
                   }}
                 />
               </div>
@@ -166,31 +212,41 @@ const Login: React.FC = () => {
             {/* Submit Button */}
             <motion.button
               type="submit"
+              disabled={isLoading}
               style={{
                 marginTop: '1rem',
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
                 padding: '18px 0', width: '100%', borderRadius: '9999px',
-                backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)',
-                color: '#ffffff', fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase',
-                cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                backgroundColor: colors.goldTint, border: `1px solid ${colors.goldBorder}`,
+                color: colors.gold, fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase',
+                cursor: isLoading ? 'not-allowed' : 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                transition: 'all 0.3s ease'
               }}
-              whileHover={{
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                backdropFilter: 'blur(0px)',
-                borderColor: 'rgba(34, 211, 238, 0.8)',
+              whileHover={!isLoading ? {
+                backgroundColor: colors.goldGlow,
+                borderColor: colors.gold,
                 y: -2
-              }}
+              } : {}}
               transition={{ duration: 0.2 }}
             >
-              Authenticate
-              <ArrowRight size={18} color="#22d3ee" />
+              {isLoading ? (
+                <>
+                  Authenticating...
+                  <ECGIcon size={18} color={colors.gold} />
+                </>
+              ) : (
+                <>
+                  Authenticate
+                  <ArrowRight size={18} color={colors.gold} />
+                </>
+              )}
             </motion.button>
           </form>
 
           {/* Footer Link */}
-          <div style={{ textAlign: 'center', fontSize: '0.8rem', color: '#64748b' }}>
+          <div style={{ textAlign: 'center', fontSize: '0.8rem', color: colors.textMuted }}>
             New Entity?{' '}
-            <Link to="/signup" style={{ color: '#22d3ee', fontWeight: 700, textDecoration: 'none' }}>
+            <Link to="/signup" style={{ color: colors.gold, fontWeight: 700, textDecoration: 'none' }}>
               Initialize Profile
             </Link>
           </div>

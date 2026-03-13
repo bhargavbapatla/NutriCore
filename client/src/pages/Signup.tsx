@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Activity, Lock, Mail, User } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const Signup: React.FC = () => {
+    const { colors } = useTheme();
     const navigate = useNavigate();
 
     // Form Data State
@@ -41,9 +43,9 @@ const Signup: React.FC = () => {
             flexDirection: 'column',
             position: 'relative',
             overflow: 'hidden',
-            backgroundColor: '#020308',
-            fontFamily: 'sans-serif',
-            color: '#ffffff'
+            backgroundColor: colors.bgPage,
+            fontFamily: "'DM Sans', sans-serif",
+            color: colors.textPrimary
         }}>
 
             {/* --- INJECTED CSS FOR AUTOFILL RESET --- */}
@@ -54,8 +56,8 @@ const Signup: React.FC = () => {
           input:-webkit-autofill:hover, 
           input:-webkit-autofill:focus, 
           input:-webkit-autofill:active{
-              -webkit-box-shadow: 0 0 0 30px #0a0e17 inset !important;
-              -webkit-text-fill-color: white !important;
+              -webkit-box-shadow: 0 0 0 30px ${colors.bgPage} inset !important;
+              -webkit-text-fill-color: ${colors.textPrimary} !important;
               border-radius: 8px !important;
           }
         `}
@@ -63,19 +65,19 @@ const Signup: React.FC = () => {
 
             {/* --- AMBIENT BACKGROUND GLOW --- */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ position: 'absolute', top: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: 'rgba(217, 70, 239, 0.05)', filter: 'blur(100px)' }} />
-                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: 'rgba(34, 211, 238, 0.05)', filter: 'blur(100px)' }} />
+                <div style={{ position: 'absolute', top: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.rose}0a`, filter: 'blur(100px)' }} />
+                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.gold}0a`, filter: 'blur(100px)' }} />
             </div>
 
-            {/* --- INWARD FIRING NEURAL CIRCUITS (Waterflow) --- */}
+            {/* --- NEURAL CIRCUITS --- */}
             <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
                 <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#22d3ee" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.gold} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
                         </linearGradient>
                         <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#d946ef" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.rose} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
                         </linearGradient>
                     </defs>
 
@@ -88,11 +90,11 @@ const Signup: React.FC = () => {
 
             {/* --- HEADER --- */}
             <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '2rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: 'white' }}>
-                    <Activity size={24} color="#22d3ee" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em' }}>
+                    <Activity size={24} color={colors.gold} />
                     NUTRICORE
                 </div>
-                <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.15em', transition: 'color 0.3s' }} onMouseOver={(e) => e.currentTarget.style.color = '#22d3ee'} onMouseOut={(e) => e.currentTarget.style.color = '#a0aabf'}>
+                <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em', transition: 'color 0.3s' }}>
                     Return Home
                 </Link>
             </header>
@@ -107,9 +109,9 @@ const Signup: React.FC = () => {
                         width: '100%',
                         maxWidth: '520px',
                         padding: '3.5rem',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                        borderRadius: '16px', /* Professional rectangular card */
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        backgroundColor: colors.bgCard,
+                        borderRadius: '16px',
+                        border: `1px solid ${colors.borderDefault}`,
                         backdropFilter: 'blur(24px)',
                         WebkitBackdropFilter: 'blur(24px)',
                         boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
@@ -120,10 +122,10 @@ const Signup: React.FC = () => {
                 >
                     {/* Titles */}
                     <div style={{ textAlign: 'center' }}>
-                        <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: '#ffffff' }}>
+                        <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: colors.textPrimary }}>
                             Create an Account
                         </h1>
-                        <p style={{ fontSize: '0.9rem', color: '#a0aabf', margin: 0 }}>
+                        <p style={{ fontSize: '0.9rem', color: colors.textMuted, margin: 0 }}>
                             Set up your professional profile to continue.
                         </p>
                     </div>
@@ -134,11 +136,11 @@ const Signup: React.FC = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                             {/* Name Field */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a0aabf', letterSpacing: '0.05em' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
                                     Name
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: nameFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: nameFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                                         <User size={16} />
                                     </div>
                                     <input
@@ -152,8 +154,8 @@ const Signup: React.FC = () => {
                                         onBlur={() => setNameFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${nameFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                                            borderRadius: '8px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${nameFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
                                         }}
                                     />
                                 </div>
@@ -161,11 +163,11 @@ const Signup: React.FC = () => {
 
                             {/* Email Field */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a0aabf', letterSpacing: '0.05em' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
                                     Email ID
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Mail size={16} />
                                     </div>
                                     <input
@@ -179,8 +181,8 @@ const Signup: React.FC = () => {
                                         onBlur={() => setEmailFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                                            borderRadius: '8px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
                                         }}
                                     />
                                 </div>
@@ -190,11 +192,11 @@ const Signup: React.FC = () => {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
                             {/* Password Field */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a0aabf', letterSpacing: '0.05em' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
                                     Password
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Lock size={16} />
                                     </div>
                                     <input
@@ -208,8 +210,8 @@ const Signup: React.FC = () => {
                                         onBlur={() => setPassFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                                            borderRadius: '8px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
                                         }}
                                     />
                                 </div>
@@ -217,11 +219,11 @@ const Signup: React.FC = () => {
 
                             {/* Confirm Password Field */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: '#a0aabf', letterSpacing: '0.05em' }}>
+                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
                                     Confirm Password
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: confirmFocus ? '#22d3ee' : '#64748b', transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: confirmFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Lock size={16} />
                                     </div>
                                     <input
@@ -235,43 +237,43 @@ const Signup: React.FC = () => {
                                         onBlur={() => setConfirmFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${confirmFocus ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.1)'}`,
-                                            borderRadius: '8px', color: '#ffffff', fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${confirmFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
                                         }}
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Submit Button - Now a sleek rectangle */}
+                        {/* Submit Button */}
                         <motion.button
                             type="submit"
                             style={{
                                 marginTop: '1.5rem',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                                 padding: '16px 0', width: '100%',
-                                borderRadius: '8px', /* Professional rectangular button */
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)',
-                                color: '#ffffff', fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                borderRadius: '8px',
+                                backgroundColor: colors.goldTint, border: `1px solid ${colors.goldBorder}`,
+                                color: colors.gold, fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                                 cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                                transition: 'all 0.3s ease'
                             }}
                             whileHover={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                                backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)',
-                                borderColor: 'rgba(34, 211, 238, 0.8)',
+                                backgroundColor: colors.goldGlow,
+                                borderColor: colors.gold,
                                 y: -2
                             }}
                             transition={{ duration: 0.2 }}
                         >
                             Create
-                            <ArrowRight size={18} color="#fafafa" />
+                            <ArrowRight size={18} color={colors.gold} />
                         </motion.button>
                     </form>
 
                     {/* Footer Link */}
-                    <div style={{ textAlign: 'center', fontSize: '0.85rem', color: '#64748b' }}>
+                    <div style={{ textAlign: 'center', fontSize: '0.85rem', color: colors.textMuted }}>
                         Already have an account?{' '}
-                        <Link to="/login" style={{ color: '#fafafa', fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to="/login" style={{ color: colors.gold, fontWeight: 600, textDecoration: 'none' }}>
                             Log in
                         </Link>
                     </div>
