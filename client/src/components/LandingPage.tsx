@@ -66,7 +66,6 @@ const LandingPage: React.FC = () => {
         color: '#ffffff',
         overflowX: 'hidden',
         position: 'relative',
-        fontFamily: 'sans-serif',
         /* CRITICAL FIX: Background applied directly to the main container, overwriting any white defaults */
         background: 'radial-gradient(circle at 50% 0%, #0a1128 0%, #020308 50%, #000000 100%)',
         backgroundColor: '#020308' // Fallback
@@ -136,7 +135,7 @@ const LandingPage: React.FC = () => {
                 color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
                 cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
               }}
-              whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)', borderColor: 'rgba(34, 211, 238, 0.8)', y: -2 }}
+              whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(0px)', borderColor: 'rgba(34, 211, 238, 0.8)', y: -2 }}
               transition={{ duration: 0.2 }}
             >
               Initialize Setup Access
