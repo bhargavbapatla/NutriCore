@@ -2,7 +2,8 @@
 
 .landing-container {
   min-height: 100vh;
-  background-color: #050510; /* Deep dark blue/black */
+  background-color: #050510;
+  /* Deep dark blue/black */
   color: #ffffff;
   overflow-x: hidden;
   position: relative;
@@ -146,7 +147,8 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background-color: #121e31; /* Base deep blue */
+  background-color: #121e31;
+  /* Base deep blue */
 }
 
 /* Noise overlay */
@@ -170,13 +172,15 @@
   border-radius: 50%;
   filter: blur(120px);
   z-index: 0;
-  opacity: 0.7; /* Increased opacity for richer colors */
+  opacity: 0.7;
+  /* Increased opacity for richer colors */
 }
 
 .blob-1 {
   width: 800px;
   height: 800px;
-  background: rgba(36, 75, 126, 0.8); /* Muted slate blue */
+  background: rgba(36, 75, 126, 0.8);
+  /* Muted slate blue */
   top: -20%;
   left: -10%;
 }
@@ -184,7 +188,8 @@
 .blob-2 {
   width: 1000px;
   height: 800px;
-  background: rgba(71, 114, 161, 0.6); /* Lighter elegant blue */
+  background: rgba(71, 114, 161, 0.6);
+  /* Lighter elegant blue */
   bottom: -20%;
   right: -20%;
 }
@@ -192,7 +197,8 @@
 .blob-3 {
   width: 900px;
   height: 700px;
-  background: rgba(14, 25, 43, 0.9); /* Very dark navy to create depth */
+  background: rgba(14, 25, 43, 0.9);
+  /* Very dark navy to create depth */
   top: 40%;
   left: 40%;
   transform: translate(-50%, -50%);
@@ -230,31 +236,49 @@
 }
 
 .btn-pill {
-  padding: 1rem 2rem;
-  border-radius: 50px;
-  background: #ffffff;
-  color: #ff3e3e; /* Orange/Red from reference */
-  font-weight: 700;
-  font-size: 1.1rem;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
+  padding: 1rem 2.5rem;
+  border-radius: 100px;
+  /* Perfect pill shape */
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  /* Ultra-thin crisp border */
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  /* Heavy Glass Blur */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  /* Blur drops instantly (0s), background and border fade smoothly (0.3s) */
+  transition: backdrop-filter 0s, -webkit-backdrop-filter 0s, background 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  /* Instant Unblur */
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+
+  /* Augen-style illumination */
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(34, 211, 238, 0.6);
+  /* Cyan tech accent */
 }
 
+/* Augen.pro signature arrow sliding effect */
 .btn-pill svg {
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-pill:hover svg {
-  transform: translateX(4px);
+  transform: translateX(6px);
 }
 
 .btn-secondary {
@@ -371,7 +395,7 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(87, 115, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+  background: radial-gradient(circle, rgba(87, 115, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -431,17 +455,22 @@
   .nav-links {
     display: none;
   }
+
   .hero-actions {
     flex-direction: column;
     align-items: stretch;
   }
-  .btn-primary, .btn-secondary {
+
+  .btn-primary,
+  .btn-secondary {
     width: 100%;
     justify-content: center;
   }
+
   .cta-box {
     padding: 3rem 1.5rem;
   }
+
   .footer {
     flex-direction: column;
     gap: 1rem;

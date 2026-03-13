@@ -6,19 +6,19 @@ const Hero: React.FC = () => {
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
+      transition: {
         staggerChildren: 0.3,
-        delayChildren: 0.2 
+        delayChildren: 0.2
       }
     }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 1.2 }
     }
@@ -26,7 +26,7 @@ const Hero: React.FC = () => {
 
   return (
     <section className="hero-section">
-      <motion.div 
+      <motion.div
         className="hero-content"
         style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', paddingBottom: '5vh' }}
         variants={containerVariants}
@@ -34,7 +34,7 @@ const Hero: React.FC = () => {
         animate="visible"
       >
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          
+
           <motion.h1 variants={itemVariants} className="massive-title">
             NUTRI
           </motion.h1>
@@ -43,9 +43,9 @@ const Hero: React.FC = () => {
             <p className="hero-subtitle">
               Transforming biological potential into measurable performance. Building an organization that fosters physical development.
             </p>
-            
+
             <button className="btn-pill">
-              Launch Protocol <ArrowRight size={18} color="#ff3e3e" />
+              Launch Protocol <ArrowRight size={18} />
             </button>
           </motion.div>
 
