@@ -2,138 +2,168 @@ import React, { useEffect, useRef } from 'react';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import Features from './Features';
-import '../styles/Landing.css';
 import { motion } from 'framer-motion';
-import { Activity } from 'lucide-react';
+import { Activity, ArrowRight } from 'lucide-react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const LandingPage: React.FC = () => {
-  const blob1Ref = useRef<HTMLDivElement>(null);
-  const blob2Ref = useRef<HTMLDivElement>(null);
-  const blob3Ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (blob1Ref.current && blob2Ref.current && blob3Ref.current) {
-      // Breathing, slow liquid animations
-      gsap.to(blob1Ref.current, {
-        x: 'random(-10, 10)vw',
-        y: 'random(-10, 10)vh',
-        scale: 'random(0.85, 1.2)', // Increased scale variance for breathing
-        opacity: 'random(0.5, 0.9)', // Opacity breathing
-        duration: 25,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
+    // 1. Lenis Smooth Scrolling
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+
+    // 2. Safe GSAP Animations
+    const ctx = gsap.context(() => {
+      const sections = gsap.utils.toArray<HTMLElement>('.fade-up-section');
+
+      sections.forEach((section) => {
+        gsap.set(section, { autoAlpha: 0, y: 80, scale: 0.98 });
+
+        gsap.to(section, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          duration: 1.2,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: section,
+            start: "top 85%",
+            toggleActions: "play none none reverse",
+          }
+        });
       });
 
-      gsap.to(blob2Ref.current, {
-        x: 'random(-15, 15)vw',
-        y: 'random(-10, 15)vh',
-        scale: 'random(0.9, 1.25)',
-        opacity: 'random(0.4, 0.8)',
-        duration: 30,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        delay: 2,
-      });
+      setTimeout(() => ScrollTrigger.refresh(), 500);
+    }, containerRef);
 
-      gsap.to(blob3Ref.current, {
-        x: 'random(-5, 15)vw',
-        y: 'random(-15, 5)vh',
-        scale: 'random(0.8, 1.15)',
-        opacity: 'random(0.6, 1)',
-        duration: 35,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        delay: 5,
-      });
-    }
+    return () => {
+      ctx.revert();
+      lenis.destroy();
+      gsap.ticker.remove(lenis.raf);
+    };
   }, []);
 
   return (
-    <div className="landing-container">
-      {/* Global Background */}
-      <div className="canvas-container">
-        <div ref={blob1Ref} className="bg-blob blob-1"></div>
-        <div ref={blob2Ref} className="bg-blob blob-2"></div>
-        <div ref={blob3Ref} className="bg-blob blob-3"></div>
-        
-        {/* Circuit Connections SVG */}
-        <svg 
-          className="circuit-overlay"
-          width="100%" 
-          height="100%" 
-          style={{ position: 'absolute', top: 0, left: 0, zIndex: 1, pointerEvents: 'none', opacity: 0.15 }}
-        >
-          <motion.path 
-            d="M 10 500 Q 300 500 400 300 T 800 200" 
-            fill="transparent" 
-            stroke="#ffffff" 
-            strokeWidth="1"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: [0, 1, 0] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.path 
-            d="M 1200 100 Q 900 100 800 400 T 200 600" 
-            fill="transparent" 
-            stroke="#ffffff" 
-            strokeWidth="1"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: [0, 0.8, 0] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear", delay: 5 }}
-          />
-          <motion.circle cx="400" cy="300" r="3" fill="#ffffff" 
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 15, repeat: Infinity }}
-          />
-          <motion.circle cx="800" cy="400" r="3" fill="#ffffff" 
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 20, repeat: Infinity, delay: 5 }}
-          />
+    <div
+      ref={containerRef}
+      style={{
+        minHeight: '100vh',
+        color: '#ffffff',
+        overflowX: 'hidden',
+        position: 'relative',
+        fontFamily: 'sans-serif',
+        /* CRITICAL FIX: Background applied directly to the main container, overwriting any white defaults */
+        background: 'radial-gradient(circle at 50% 0%, #0a1128 0%, #020308 50%, #000000 100%)',
+        backgroundColor: '#020308' // Fallback
+      }}
+    >
+      <style>
+        {`
+          ::-webkit-scrollbar { display: none; }
+          * { -ms-overflow-style: none; scrollbar-width: none; }
+          html.lenis, html.lenis body { height: auto; }
+          .lenis.lenis-smooth { scroll-behavior: auto !important; }
+          .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+          .lenis.lenis-stopped { overflow: hidden; }
+        `}
+      </style>
+
+      {/* BACKGROUND CIRCUITS - Fixed to zIndex 0 so it stays above the dark background but below content */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+        <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#22d3ee" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+            <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
+              <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor="#d946ef" stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+          </defs>
+          <motion.path d="M -50 200 C 200 200, 400 450, 720 450" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M -50 750 C 300 750, 500 550, 720 550" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
+          <motion.path d="M 1490 150 C 1200 150, 1000 450, 720 450" fill="transparent" stroke="url(#glowRight)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
+          <motion.path d="M 1490 800 C 1100 800, 900 550, 720 550" fill="transparent" stroke="url(#glowRight)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
         </svg>
       </div>
 
       <Navbar />
-      <Hero />
-      <Features />
-      
-      {/* CTA Section */}
-      <section className="cta-section">
-        <motion.div 
-          className="cta-box glass-panel"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="cta-content">
-            <h2 className="cta-title">Ready to Upgrade Your Biology?</h2>
-            <p className="cta-subtitle secondary-text">
+
+      {/* Main Container */}
+      <main style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
+
+        {/* Your Hero should be transparent so it shows the dark gradient from the wrapper */}
+        <Hero />
+
+        <div className="fade-up-section">
+          <Features />
+        </div>
+
+        {/* --- BULLETPROOF CTA SECTION --- */}
+        <section className="fade-up-section" style={{ padding: '8rem 5%', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+          <div style={{
+            width: '100%', maxWidth: '900px', padding: '5rem 2rem',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem', textAlign: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: '40px', border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+          }}>
+            <h2 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 900, margin: 0, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              Ready to Upgrade Your Biology?
+            </h2>
+            <p style={{ fontSize: '1.25rem', color: '#a0aabf', margin: 0, maxWidth: '600px', lineHeight: 1.6 }}>
               Join the elite group of individuals leveraging deep data for superior health and cognition.
             </p>
-            <button className="btn-primary" style={{ margin: '0 auto' }}>
+            <motion.button
+              onClick={() => window.location.href = '/signup'}
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                padding: '16px 40px', borderRadius: '9999px', marginTop: '1rem',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase',
+                cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+              }}
+              whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(0px)', WebkitBackdropFilter: 'blur(0px)', borderColor: 'rgba(34, 211, 238, 0.8)', y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
               Initialize Setup Access
-            </button>
+              <ArrowRight size={18} color="#22d3ee" />
+            </motion.button>
           </div>
-        </motion.div>
-      </section>
+        </section>
+      </main>
 
-      {/* Basic Footer */}
-      <footer className="footer">
-        <div className="footer-logo">
-          <Activity size={20} color="#00f0ff" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '8px' }} />
+      <footer
+        className="fade-up-section"
+        style={{
+          position: 'relative', zIndex: 10, padding: '4rem 5%',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)', backgroundColor: '#020308',
+          display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '2rem'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '1.25rem', color: 'white' }}>
+          <Activity size={24} color="#22d3ee" />
           NutriCore
         </div>
-        <div className="footer-links">
-          <a href="#" className="footer-link">Privacy Protocol</a>
-          <a href="#" className="footer-link">Terms of Service</a>
-          <a href="#" className="footer-link">System Status</a>
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          <a href="#" style={{ color: '#a0aabf', textDecoration: 'none', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Privacy Protocol</a>
+          <a href="#" style={{ color: '#a0aabf', textDecoration: 'none', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em' }}>Terms of Service</a>
         </div>
-        <div className="secondary-text" style={{ fontSize: '0.9rem' }}>
-          &copy; {new Date().getFullYear()} NutriCore Systems. All rights reserved.
+        <div style={{ color: '#64748b', fontSize: '0.65rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+          &copy; {new Date().getFullYear()} NutriCore Systems. Secure Link Established.
         </div>
       </footer>
     </div>

@@ -1,9 +1,13 @@
-import LandingPage from './components/LandingPage';
+import AppRoutes from './AppRoutes';
+import { Suspense } from 'react';
+import Loader from './components/loader/Loader';
 
 function App() {
   return (
-    <LandingPage />
-  )
+    <Suspense fallback={<Loader />}>
+      <AppRoutes />
+    </Suspense>
+  );
 }
 
-export default App
+export default App;
