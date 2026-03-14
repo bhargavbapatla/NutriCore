@@ -65,8 +65,8 @@ const Signup: React.FC = () => {
 
             {/* --- AMBIENT BACKGROUND GLOW --- */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ position: 'absolute', top: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.rose}0a`, filter: 'blur(100px)' }} />
-                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.gold}0a`, filter: 'blur(100px)' }} />
+                <div style={{ position: 'absolute', top: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.danger}0a`, filter: 'blur(100px)' }} />
+                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.emerald}0a`, filter: 'blur(100px)' }} />
             </div>
 
             {/* --- NEURAL CIRCUITS --- */}
@@ -74,10 +74,10 @@ const Signup: React.FC = () => {
                 <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
                     <defs>
                         <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.gold} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.emerald} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
                         </linearGradient>
                         <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.rose} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.danger} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
                         </linearGradient>
                     </defs>
 
@@ -91,7 +91,7 @@ const Signup: React.FC = () => {
             {/* --- HEADER --- */}
             <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '2rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em' }}>
-                    <Activity size={24} color={colors.gold} />
+                    <Activity size={24} color={colors.emerald} />
                     NUTRICORE
                 </div>
                 <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em', transition: 'color 0.3s' }}>
@@ -140,7 +140,7 @@ const Signup: React.FC = () => {
                                     Name
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: nameFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: nameFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
                                         <User size={16} />
                                     </div>
                                     <input
@@ -154,7 +154,7 @@ const Signup: React.FC = () => {
                                         onBlur={() => setNameFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${nameFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${nameFocus ? colors.emeraldBorder : colors.borderSubtle}`,
                                             borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
                                         }}
                                     />
@@ -167,7 +167,7 @@ const Signup: React.FC = () => {
                                     Email ID
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Mail size={16} />
                                     </div>
                                     <input
@@ -181,7 +181,7 @@ const Signup: React.FC = () => {
                                         onBlur={() => setEmailFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.emeraldBorder : colors.borderSubtle}`,
                                             borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
                                         }}
                                     />
@@ -196,7 +196,7 @@ const Signup: React.FC = () => {
                                     Password
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Lock size={16} />
                                     </div>
                                     <input
@@ -210,7 +210,7 @@ const Signup: React.FC = () => {
                                         onBlur={() => setPassFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.emeraldBorder : colors.borderSubtle}`,
                                             borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
                                         }}
                                     />
@@ -223,7 +223,7 @@ const Signup: React.FC = () => {
                                     Confirm Password
                                 </label>
                                 <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: confirmFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
+                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: confirmFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
                                         <Lock size={16} />
                                     </div>
                                     <input
@@ -237,7 +237,7 @@ const Signup: React.FC = () => {
                                         onBlur={() => setConfirmFocus(false)}
                                         style={{
                                             width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${confirmFocus ? colors.goldBorder : colors.borderSubtle}`,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${confirmFocus ? colors.emeraldBorder : colors.borderSubtle}`,
                                             borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
                                         }}
                                     />
@@ -253,27 +253,27 @@ const Signup: React.FC = () => {
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                                 padding: '16px 0', width: '100%',
                                 borderRadius: '8px',
-                                backgroundColor: colors.goldTint, border: `1px solid ${colors.goldBorder}`,
-                                color: colors.gold, fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                backgroundColor: colors.emeraldTint, border: `1px solid ${colors.emeraldBorder}`,
+                                color: colors.emerald, fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
                                 cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
                                 transition: 'all 0.3s ease'
                             }}
                             whileHover={{
-                                backgroundColor: colors.goldGlow,
-                                borderColor: colors.gold,
+                                backgroundColor: colors.emeraldGlow,
+                                borderColor: colors.emerald,
                                 y: -2
                             }}
                             transition={{ duration: 0.2 }}
                         >
                             Create
-                            <ArrowRight size={18} color={colors.gold} />
+                            <ArrowRight size={18} color={colors.emerald} />
                         </motion.button>
                     </form>
 
                     {/* Footer Link */}
                     <div style={{ textAlign: 'center', fontSize: '0.85rem', color: colors.textMuted }}>
                         Already have an account?{' '}
-                        <Link to="/login" style={{ color: colors.gold, fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to="/login" style={{ color: colors.emerald, fontWeight: 600, textDecoration: 'none' }}>
                             Log in
                         </Link>
                     </div>

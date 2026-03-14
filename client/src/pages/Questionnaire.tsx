@@ -152,24 +152,24 @@ const OptionCard: React.FC<{
     <button
         onClick={onClick}
         style={{
-            background: selected ? colors.goldTint : colors.bgCard,
-            border: `0.5px solid ${selected ? colors.gold : colors.borderSubtle}`,
+            background: selected ? colors.emeraldTint : colors.bgCard,
+            border: `0.5px solid ${selected ? colors.emerald : colors.borderSubtle}`,
             borderRadius: 14, padding: '14px 18px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left',
-            color: selected ? colors.gold : colors.textBody, width: '100%',
+            color: selected ? colors.emerald : colors.textBody, width: '100%',
             transition: 'all 0.18s',
         }}
     >
         <div style={{
             width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-            background: selected ? colors.goldTint : 'rgba(255,255,255,0.05)',
+            background: selected ? colors.emeraldTint : 'rgba(255,255,255,0.05)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17,
         }}>
             {icon}
         </div>
         <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{label}</div>
-            {desc && <div style={{ fontSize: 12, color: selected ? colors.gold : colors.textMuted, marginTop: 2 }}>{desc}</div>}
+            {desc && <div style={{ fontSize: 12, color: selected ? colors.emerald : colors.textMuted, marginTop: 2 }}>{desc}</div>}
         </div>
     </button>
 );
@@ -182,16 +182,16 @@ const TileCard: React.FC<{
     <button
         onClick={onClick}
         style={{
-            background: selected ? colors.goldTint : colors.bgCard,
-            border: `0.5px solid ${selected ? colors.gold : colors.borderSubtle}`,
+            background: selected ? colors.emeraldTint : colors.bgCard,
+            border: `0.5px solid ${selected ? colors.emerald : colors.borderSubtle}`,
             borderRadius: 14, padding: '18px 14px', cursor: 'pointer',
-            textAlign: 'center', color: selected ? colors.gold : colors.textBody,
+            textAlign: 'center', color: selected ? colors.emerald : colors.textBody,
             transition: 'all 0.18s',
         }}
     >
         <div style={{ fontSize: 22, marginBottom: 8 }}>{icon}</div>
         <div style={{ fontSize: 13, fontWeight: 600 }}>{label}</div>
-        {sub && <div style={{ fontSize: 11, color: selected ? colors.gold : colors.textMuted, marginTop: 3 }}>{sub}</div>}
+        {sub && <div style={{ fontSize: 11, color: selected ? colors.emerald : colors.textMuted, marginTop: 3 }}>{sub}</div>}
     </button>
 );
 
@@ -257,8 +257,8 @@ const Questionnaire: React.FC = () => {
         }}>
             {/* Ambient blobs */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-                <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '600px', height: '600px', background: `${colors.gold}0a`, filter: 'blur(120px)', borderRadius: '50%' }} />
-                <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '600px', height: '600px', background: `${colors.rose}0a`, filter: 'blur(120px)', borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', top: '-10%', left: '-5%', width: '600px', height: '600px', background: `${colors.emerald}0a`, filter: 'blur(120px)', borderRadius: '50%' }} />
+                <div style={{ position: 'absolute', bottom: '-10%', right: '-5%', width: '600px', height: '600px', background: `${colors.danger}0a`, filter: 'blur(120px)', borderRadius: '50%' }} />
             </div>
 
             {/* Header */}
@@ -279,7 +279,7 @@ const Questionnaire: React.FC = () => {
                 {/* Progress bar */}
                 <div style={{ flex: 1, height: 4, background: colors.borderSubtle, borderRadius: 999, overflow: 'hidden' }}>
                     <motion.div
-                        style={{ height: '100%', background: colors.gold, borderRadius: 999 }}
+                        style={{ height: '100%', background: colors.emerald, borderRadius: 999 }}
                         animate={{ width: done ? '100%' : `${progress}%` }}
                         transition={{ duration: 0.6, ease: "easeOut" }}
                     />
@@ -315,8 +315,8 @@ const Questionnaire: React.FC = () => {
                             // ── Summary ──
                             <>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                                    <ECGIcon color={colors.gold} />
-                                    <span style={{ fontSize: 11, fontWeight: 900, color: colors.gold, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Profile Initialized</span>
+                                    <ECGIcon color={colors.emerald} />
+                                    <span style={{ fontSize: 11, fontWeight: 900, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Profile Initialized</span>
                                 </div>
                                 <div style={{ fontSize: '2rem', fontWeight: 900, color: colors.textPrimary, marginBottom: 8, letterSpacing: '-0.02em' }}>Intelligence Summary</div>
                                 <p style={{ fontSize: '0.9rem', color: colors.textMuted, marginBottom: '2rem' }}>Biological data verification complete. Review your protocol baselines.</p>
@@ -332,20 +332,20 @@ const Questionnaire: React.FC = () => {
                                     ].map(row => (
                                         <div key={row.k} style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 0', borderBottom: `1px solid ${colors.borderSubtle}`, fontSize: '0.9rem' }}>
                                             <span style={{ color: colors.textMuted, fontWeight: 600 }}>{row.k}</span>
-                                            <span style={{ color: colors.gold, fontWeight: 700 }}>{row.v}</span>
+                                            <span style={{ color: colors.emerald, fontWeight: 700 }}>{row.v}</span>
                                         </div>
                                     ))}
                                 </div>
 
                                 <motion.button
                                     onClick={() => navigate('/dashboard')}
-                                    whileHover={{ scale: 1.02, backgroundColor: colors.goldTint }}
+                                    whileHover={{ scale: 1.02, backgroundColor: colors.emeraldTint }}
                                     whileTap={{ scale: 0.98 }}
                                     style={{
                                         marginTop: '2.5rem', width: '100%', padding: '18px',
-                                        background: colors.goldTint, color: colors.gold, fontSize: '0.85rem',
+                                        background: colors.emeraldTint, color: colors.emerald, fontSize: '0.85rem',
                                         fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase',
-                                        border: `1px solid ${colors.goldBorder}`, borderRadius: 12, cursor: 'pointer',
+                                        border: `1px solid ${colors.emeraldBorder}`, borderRadius: 12, cursor: 'pointer',
                                         backdropFilter: 'blur(10px)', transition: 'all 0.3s ease'
                                     }}
                                 >
@@ -355,7 +355,7 @@ const Questionnaire: React.FC = () => {
                         ) : (
                             // ── Step ──
                             <>
-                                <div style={{ fontSize: 11, fontWeight: 900, color: colors.gold, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
+                                <div style={{ fontSize: 11, fontWeight: 900, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
                                     Step {current + 1}
                                 </div>
                                 <div style={{ fontSize: '2rem', fontWeight: 900, color: colors.textPrimary, marginBottom: 12, letterSpacing: '-0.02em' }}>{step.title}</div>
@@ -410,7 +410,7 @@ const Questionnaire: React.FC = () => {
                                             onChange={e => setAnswer(step.key, parseFloat(e.target.value))}
                                             style={{
                                                 width: '100%',
-                                                accentColor: colors.gold,
+                                                accentColor: colors.emerald,
                                                 marginBottom: 16,
                                                 cursor: 'pointer'
                                             }}
@@ -424,13 +424,13 @@ const Questionnaire: React.FC = () => {
                                 <motion.button
                                     onClick={handleNext}
                                     disabled={!canProceed(step, answers)}
-                                    whileHover={canProceed(step, answers) ? { backgroundColor: colors.goldTint } : {}}
+                                    whileHover={canProceed(step, answers) ? { backgroundColor: colors.emeraldTint } : {}}
                                     style={{
                                         width: '100%', padding: '18px',
-                                        background: canProceed(step, answers) ? colors.goldTint : 'rgba(255,255,255,0.03)',
-                                        color: canProceed(step, answers) ? colors.gold : colors.textMuted,
+                                        background: canProceed(step, answers) ? colors.emeraldTint : 'rgba(255,255,255,0.03)',
+                                        color: canProceed(step, answers) ? colors.emerald : colors.textMuted,
                                         fontSize: '0.85rem', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase',
-                                        border: `1px solid ${canProceed(step, answers) ? colors.goldBorder : colors.borderSubtle}`, borderRadius: 12,
+                                        border: `1px solid ${canProceed(step, answers) ? colors.emeraldBorder : colors.borderSubtle}`, borderRadius: 12,
                                         cursor: canProceed(step, answers) ? 'pointer' : 'not-allowed',
                                         transition: 'all 0.3s ease',
                                         backdropFilter: 'blur(10px)'

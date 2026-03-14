@@ -1,97 +1,97 @@
 import { createContext, useContext, type ReactNode } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// ThemeColors — full design token surface for NutriCore
+// NutriCore Design Tokens — Deep Slate + Emerald
 //
 // Palette rationale:
-//   Base     → warm charcoal (#0e0c0a) — not cold blue-black, feels premium
-//   Primary  → amber-gold (#e8b86d)    — warmth, nutrition, premium health
-//   Secondary→ sage green (#7eb89a)    — nature, wellness, macros/tracking
-//   Tertiary → dusty rose (#c47a7a)    — alerts, diabetes agent, warnings
-//   Text     → warm off-whites         — cream hierarchy, never harsh white
+//   Base      → deep green-black slate  — biotech terminal, alive not cold
+//   Primary   → emerald (#10b981)       — health, precision, nature + tech
+//   Secondary → teal (#0d9488)          — depth accent, hover states
+//   Danger    → rose (#f43f5e)          — alerts, logout, warnings
+//   Text      → warm green-white cream  — easy on eyes, cohesive with base
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface ThemeColors {
   // ── Backgrounds (darkest → lightest) ──────────────────────────────────────
-  bgPage: string;   // #0e0c0a — warm near-black page base
-  bgSurface: string;   // #141210 — slightly lifted sections
-  bgCard: string;   // #1c1916 — card / panel backgrounds
-  bgElevated: string;   // #252118 — hover states, active cards
+  bgPage: string;   // #0a0f0e — deep green-black page base
+  bgSurface: string;   // #0f1512 — slightly lifted sections / sidebar
+  bgCard: string;   // #161e1b — card and panel backgrounds
+  bgElevated: string;   // #1e2b27 — hover states, active cards, input bg
 
-  // ── Primary accent: Amber Gold ────────────────────────────────────────────
-  gold: string;  // #e8b86d — CTA buttons, active state, logo ECG line
-  goldLight: string;  // #f5d08a — hover state of gold elements
-  goldDim: string;  // #c49a4e — muted gold for decorative lines, dividers
-  goldTint: string;  // rgba(232,184,109,0.08) — badge / pill backgrounds
-  goldBorder: string;  // rgba(232,184,109,0.2)  — badge / pill borders
-  goldGlow: string;  // rgba(232,184,109,0.12) — subtle hover glow fills
+  // ── Primary accent: Emerald ───────────────────────────────────────────────
+  emerald: string;  // #10b981 — CTAs, active nav, send button, logo line
+  emeraldLight: string;  // #34d399 — hover state
+  emeraldDim: string;  // #059669 — muted/dimmed emerald for borders, dividers
+  emeraldTint: string;  // rgba(16,185,129,0.08) — badge/chip backgrounds
+  emeraldBorder: string;  // rgba(16,185,129,0.2)  — badge/chip borders
+  emeraldGlow: string;  // rgba(16,185,129,0.12) — hover fills, card glows
 
-  // ── Secondary accent: Sage Green ─────────────────────────────────────────
-  sage: string;  // #7eb89a — FitnessAgent, DeficiencyAgent, healthy states
-  sageTint: string;  // rgba(126,184,154,0.08)
-  sageBorder: string;  // rgba(126,184,154,0.2)
+  // ── Secondary accent: Teal ────────────────────────────────────────────────
+  teal: string;  // #0d9488 — secondary tags, secondary agent labels
+  tealTint: string;  // rgba(13,148,136,0.08)
+  tealBorder: string;  // rgba(13,148,136,0.2)
 
-  // ── Tertiary accent: Dusty Rose ───────────────────────────────────────────
-  rose: string;  // #c47a7a — DiabetesAgent, alerts, warnings
-  roseTint: string;  // rgba(196,122,122,0.08)
-  roseBorder: string;  // rgba(196,122,122,0.2)
+  // ── Danger accent: Rose ───────────────────────────────────────────────────
+  danger: string;  // #f43f5e — logout, critical alerts, errors
+  dangerTint: string;  // rgba(244,63,94,0.08)
+  dangerBorder: string;  // rgba(244,63,94,0.2)
 
   // ── Text hierarchy (brightest → dimmest) ─────────────────────────────────
-  textPrimary: string;  // #f5f0e8 — headlines, card titles (warm off-white)
-  textBody: string;  // #a09880 — body copy, descriptions
-  textMuted: string;  // #5a5245 — labels, hints, nav links, footer text
+  textPrimary: string;  // #ecfdf5 — headlines, bubble text (green-white)
+  textBody: string;  // #6ee7b7 — body copy, descriptions (soft green)
+  textMuted: string;  // #4d7c6e — labels, nav links, hints, timestamps
 
   // ── Borders ───────────────────────────────────────────────────────────────
-  borderSubtle: string; // rgba(255,248,235,0.06) — hairlines, section dividers
-  borderDefault: string; // rgba(255,248,235,0.1)  — card borders, inputs
-  borderHover: string; // rgba(232,184,109,0.25) — hovered card borders
+  borderSubtle: string;  // rgba(16,185,129,0.07) — hairlines, section dividers
+  borderDefault: string;  // rgba(16,185,129,0.14) — cards, inputs
+  borderHover: string;  // rgba(16,185,129,0.28) — focused/hovered borders
 
-  // ── Semantic (for status indicators & agent tags) ─────────────────────────
-  semanticSuccess: string; // #7eb89a — goal achieved, calorie in range
-  semanticWarning: string; // #e8b86d — cheat day, nearing limit
-  semanticDanger: string; // #c47a7a — deficiency, glucose spike
+  // ── Semantic — status indicators ─────────────────────────────────────────
+  semanticSuccess: string;  // #10b981 — goal hit, in range
+  semanticWarning: string;  // #f59e0b — nearing limit, cheat day
+  semanticDanger: string;  // #f43f5e — deficiency spike, critical alert
 }
 
 // ─── Token values ─────────────────────────────────────────────────────────────
 const colors: ThemeColors = {
   // Backgrounds
-  bgPage: '#0e0c0a',
-  bgSurface: '#141210',
-  bgCard: '#1c1916',
-  bgElevated: '#252118',
+  bgPage: '#0a0f0e',
+  bgSurface: '#0f1512',
+  bgCard: '#161e1b',
+  bgElevated: '#1e2b27',
 
-  // Gold
-  gold: '#e8b86d',
-  goldLight: '#f5d08a',
-  goldDim: '#c49a4e',
-  goldTint: 'rgba(232,184,109,0.08)',
-  goldBorder: 'rgba(232,184,109,0.2)',
-  goldGlow: 'rgba(232,184,109,0.12)',
+  // Emerald
+  emerald: '#10b981',
+  emeraldLight: '#34d399',
+  emeraldDim: '#059669',
+  emeraldTint: 'rgba(16,185,129,0.08)',
+  emeraldBorder: 'rgba(16,185,129,0.2)',
+  emeraldGlow: 'rgba(16,185,129,0.12)',
 
-  // Sage
-  sage: '#7eb89a',
-  sageTint: 'rgba(126,184,154,0.08)',
-  sageBorder: 'rgba(126,184,154,0.2)',
+  // Teal
+  teal: '#0d9488',
+  tealTint: 'rgba(13,148,136,0.08)',
+  tealBorder: 'rgba(13,148,136,0.2)',
 
-  // Rose
-  rose: '#c47a7a',
-  roseTint: 'rgba(196,122,122,0.08)',
-  roseBorder: 'rgba(196,122,122,0.2)',
+  // Danger
+  danger: '#f43f5e',
+  dangerTint: 'rgba(244,63,94,0.08)',
+  dangerBorder: 'rgba(244,63,94,0.2)',
 
   // Text
-  textPrimary: '#f5f0e8',
-  textBody: '#a09880',
-  textMuted: '#5a5245',
+  textPrimary: '#ecfdf5',
+  textBody: '#6ee7b7',
+  textMuted: '#4d7c6e',
 
   // Borders
-  borderSubtle: 'rgba(255,248,235,0.06)',
-  borderDefault: 'rgba(255,248,235,0.1)',
-  borderHover: 'rgba(232,184,109,0.25)',
+  borderSubtle: 'rgba(16,185,129,0.07)',
+  borderDefault: 'rgba(16,185,129,0.14)',
+  borderHover: 'rgba(16,185,129,0.28)',
 
   // Semantic
-  semanticSuccess: '#7eb89a',
-  semanticWarning: '#e8b86d',
-  semanticDanger: '#c47a7a',
+  semanticSuccess: '#10b981',
+  semanticWarning: '#f59e0b',
+  semanticDanger: '#f43f5e',
 };
 
 // ─── Context ──────────────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 );
 
 export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within a ThemeProvider');
-  return context;
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useTheme must be used within a ThemeProvider');
+  return ctx;
 };

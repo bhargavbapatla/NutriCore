@@ -36,52 +36,52 @@ const Features: React.FC = () => {
 
   const featuresList = [
     {
-      icon: <Dna size={28} color={colors.gold} />,
+      icon: <Dna size={28} color={colors.emerald} />,
       title: "Genome Mapping",
       description: "Proprietary CRISPR-base sequencing to analyze your unique metabolic blueprint.",
-      accent: colors.gold,
-      tint: colors.goldTint,
-      border: colors.goldBorder
+      accent: colors.emerald,
+      tint: colors.emeraldTint,
+      border: colors.emeraldBorder
     },
     {
-      icon: <Brain size={28} color={colors.sage} />,
+      icon: <Brain size={28} color={colors.teal} />,
       title: "Neural Synergy",
       description: "Cognitive performance optimization via amino-acid and neurotransmitter balancing.",
-      accent: colors.sage,
-      tint: colors.sageTint,
-      border: colors.sageBorder
+      accent: colors.teal,
+      tint: colors.tealTint,
+      border: colors.tealBorder
     },
     {
-      icon: <Zap size={28} color={colors.gold} />,
+      icon: <Zap size={28} color={colors.emerald} />,
       title: "Cellular Energy",
       description: "Mitochondrial enhancement protocols designed to eliminate chronic fatigue.",
-      accent: colors.gold,
-      tint: colors.goldTint,
-      border: colors.goldBorder
+      accent: colors.emerald,
+      tint: colors.emeraldTint,
+      border: colors.emeraldBorder
     },
     {
-      icon: <Target size={28} color={colors.sage} />,
+      icon: <Target size={28} color={colors.teal} />,
       title: "Precision Macro",
       description: "Dynamic micro-nutrient adjustments based on real-time biometric feedback loops.",
-      accent: colors.sage,
-      tint: colors.sageTint,
-      border: colors.sageBorder
+      accent: colors.teal,
+      tint: colors.tealTint,
+      border: colors.tealBorder
     },
     {
-      icon: <Heart size={28} color={colors.rose} />,
+      icon: <Heart size={28} color={colors.danger} />,
       title: "Longevity Bio",
       description: "Advanced anti-aging protocols rooted in telomere protection and sirtuin activation.",
-      accent: colors.rose,
-      tint: colors.roseTint,
-      border: colors.roseBorder
+      accent: colors.danger,
+      tint: colors.dangerTint,
+      border: colors.dangerBorder
     },
     {
-      icon: <ShieldCheck size={28} color={colors.sage} />,
+      icon: <ShieldCheck size={28} color={colors.teal} />,
       title: "Immune Shield",
       description: "Fortify your natural defenses through data-driven immunological resilience training.",
-      accent: colors.sage,
-      tint: colors.sageTint,
-      border: colors.sageBorder
+      accent: colors.teal,
+      tint: colors.tealTint,
+      border: colors.tealBorder
     }
   ];
 

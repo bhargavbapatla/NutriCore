@@ -35,8 +35,8 @@ const Hero: React.FC = () => {
         >
             {/* Ambient Blobs */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
-                <div ref={blob1Ref} style={{ position: 'absolute', top: '-10%', left: '-10%', width: '800px', height: '800px', borderRadius: '50%', backgroundColor: `${colors.gold}0a`, filter: 'blur(120px)' }} />
-                <div ref={blob2Ref} style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '800px', height: '800px', borderRadius: '50%', backgroundColor: `${colors.sage}08`, filter: 'blur(120px)' }} />
+                <div ref={blob1Ref} style={{ position: 'absolute', top: '-10%', left: '-10%', width: '800px', height: '800px', borderRadius: '50%', backgroundColor: `${colors.emerald}0a`, filter: 'blur(120px)' }} />
+                <div ref={blob2Ref} style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '800px', height: '800px', borderRadius: '50%', backgroundColor: `${colors.teal}08`, filter: 'blur(120px)' }} />
             </div>
 
             <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '64rem' }}>
@@ -69,13 +69,13 @@ const Hero: React.FC = () => {
                             }}
                             whileHover={{
                                 backgroundColor: colors.bgElevated,
-                                borderColor: colors.gold,
+                                borderColor: colors.emerald,
                                 y: -2
                             }}
                             transition={{ duration: 0.2 }}
                         >
                             Launch Protocol
-                            <ArrowRight size={18} color={colors.gold} />
+                            <ArrowRight size={18} color={colors.emerald} />
                         </motion.button>
                         <button
                             style={{
