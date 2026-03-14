@@ -152,7 +152,7 @@ const OptionCard: React.FC<{
     <button
         onClick={onClick}
         style={{
-            background: selected ? colors.emeraldTint : colors.bgCard,
+            background: selected ? colors.emeraldTint : colors.bgElevated,
             border: `0.5px solid ${selected ? colors.emerald : colors.borderSubtle}`,
             borderRadius: 14, padding: '14px 18px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left',
@@ -182,7 +182,7 @@ const TileCard: React.FC<{
     <button
         onClick={onClick}
         style={{
-            background: selected ? colors.emeraldTint : colors.bgCard,
+            background: selected ? colors.emeraldTint : colors.bgElevated,
             border: `0.5px solid ${selected ? colors.emerald : colors.borderSubtle}`,
             borderRadius: 14, padding: '18px 14px', cursor: 'pointer',
             textAlign: 'center', color: selected ? colors.emerald : colors.textBody,
