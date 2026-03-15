@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Activity, Lock, Mail, User } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { signup } from '../api/authentication';
+import { toast } from 'sonner';
 
 const Signup: React.FC = () => {
     const { colors } = useTheme();
@@ -16,17 +18,66 @@ const Signup: React.FC = () => {
         confirmPassword: ''
     });
 
+    // Loading and Error States
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
     // Focus States for UI Highlighting
     const [nameFocus, setNameFocus] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
     const [passFocus, setPassFocus] = useState(false);
     const [confirmFocus, setConfirmFocus] = useState(false);
 
-    const handleSignup = (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate signup
-        localStorage.setItem('isAuthenticated', 'true');
-        navigate('/questionnaire');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords do not match");
+            toast.error('Validation Error', {
+                description: 'Passwords do not match'
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            // Remove confirmPassword before sending to API
+            const { confirmPassword, ...signupData } = formData;
+            const response = await signup(signupData);
+            console.log(response);
+            if (response.status === 200) {
+                toast.success(response.data.message || "Success");
+            }
+
+            localStorage.setItem('isAuthenticated', 'true');
+            navigate('/questionnaire');
+        } catch (err: any) {
+            console.error('Signup error:', err);
+
+            let errorMessage = 'Failed to create account.';
+
+            if (err.detail) {
+                if (Array.isArray(err.detail)) {
+                    // Extraction for FastAPI/Pydantic validation errors
+                    errorMessage = err.detail.map((e: any) => e.msg).join(', ');
+                } else if (typeof err.detail === 'string') {
+                    errorMessage = err.detail;
+                }
+            } else if (typeof err === 'string') {
+                errorMessage = err;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            setError(errorMessage);
+            toast.error('Signup Failed', {
+                description: errorMessage
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +85,8 @@ const Signup: React.FC = () => {
             ...formData,
             [e.target.name]: e.target.value
         });
+        // Clear error when user changes form
+        if (error) setError(null);
     };
 
     return (
@@ -244,29 +297,32 @@ const Signup: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Submit Button */}
                         <motion.button
                             type="submit"
+                            disabled={isLoading}
                             style={{
                                 marginTop: '1.5rem',
                                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                                 padding: '16px 0', width: '100%',
                                 borderRadius: '8px',
-                                backgroundColor: colors.emeraldTint, border: `1px solid ${colors.emeraldBorder}`,
-                                color: colors.emerald, fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                                cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                                transition: 'all 0.3s ease'
+                                backgroundColor: isLoading ? colors.borderDefault : colors.emeraldTint,
+                                border: `1px solid ${isLoading ? colors.borderSubtle : colors.emeraldBorder}`,
+                                color: isLoading ? colors.textMuted : colors.emerald,
+                                fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                cursor: isLoading ? 'not-allowed' : 'pointer',
+                                backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                                transition: 'all 0.3s ease',
+                                opacity: isLoading ? 0.7 : 1
                             }}
-                            whileHover={{
+                            whileHover={!isLoading ? {
                                 backgroundColor: colors.emeraldGlow,
                                 borderColor: colors.emerald,
                                 y: -2
-                            }}
+                            } : {}}
                             transition={{ duration: 0.2 }}
                         >
-                            Create
-                            <ArrowRight size={18} color={colors.emerald} />
+                            {isLoading ? 'Processing...' : 'Create'}
+                            {!isLoading && <ArrowRight size={18} color={colors.emerald} />}
                         </motion.button>
                     </form>
 

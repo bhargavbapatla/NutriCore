@@ -27,4 +27,4 @@ async def register(request: Createuser, response: Response, db: Session = Depend
         samesite="lax",
         max_age=7 * 24 * 60 * 60
     )
-        return {"message": "User created successfully", "user": user}
+        return {"message": "Account created successfully", "user": user}
