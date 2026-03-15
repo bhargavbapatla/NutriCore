@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
+  const { colors } = useTheme();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -23,10 +25,10 @@ const Navbar: React.FC = () => {
           width: '100%',
           maxWidth: '1200px',
           borderRadius: '9999px',
-          background: scrolled ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+          background: scrolled ? `${colors.bgSurface}cc` : `${colors.bgSurface}4d`,
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          border: `1px solid ${colors.borderSubtle}`,
           boxShadow: '0 10px 40px -10px rgba(0,0,0,0.5)',
           padding: '12px 24px',
           display: 'flex',
@@ -36,21 +38,21 @@ const Navbar: React.FC = () => {
         }}
       >
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: 'white' }}>
-          <Activity size={24} color="#22d3ee" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary }}>
+          <Activity size={24} color={colors.emerald} />
           NutriCore
         </div>
 
         {/* Links */}
-        <div className="hidden md:flex" style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.75rem', fontWeight: 700, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-          <a href="#features" style={{ textDecoration: 'none', color: 'inherit' }} onMouseOver={(e) => e.currentTarget.style.color = '#22d3ee'} onMouseOut={(e) => e.currentTarget.style.color = '#a0aabf'}>Features</a>
-          <a href="#about" style={{ textDecoration: 'none', color: 'inherit' }} onMouseOver={(e) => e.currentTarget.style.color = '#22d3ee'} onMouseOut={(e) => e.currentTarget.style.color = '#a0aabf'}>About</a>
-          <a href="#pricing" style={{ textDecoration: 'none', color: 'inherit' }} onMouseOver={(e) => e.currentTarget.style.color = '#22d3ee'} onMouseOut={(e) => e.currentTarget.style.color = '#a0aabf'}>Pricing</a>
+        <div className="hidden md:flex" style={{ display: 'flex', alignItems: 'center', gap: '2rem', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+          <a href="#features" style={{ textDecoration: 'none', color: 'inherit', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = colors.emerald} onMouseOut={(e) => e.currentTarget.style.color = colors.textMuted}>Features</a>
+          <a href="#about" style={{ textDecoration: 'none', color: 'inherit', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = colors.emerald} onMouseOut={(e) => e.currentTarget.style.color = colors.textMuted}>About</a>
+          <a href="#pricing" style={{ textDecoration: 'none', color: 'inherit', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = colors.emerald} onMouseOut={(e) => e.currentTarget.style.color = colors.textMuted}>Pricing</a>
         </div>
 
         {/* Action Area */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          <Link to="/login" className="hidden md:block" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: '#a0aabf', textTransform: 'uppercase', letterSpacing: '0.1em' }} onMouseOver={(e) => e.currentTarget.style.color = '#ffffff'} onMouseOut={(e) => e.currentTarget.style.color = '#a0aabf'}>
+          <Link to="/login" className="hidden md:block" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = colors.textPrimary} onMouseOut={(e) => e.currentTarget.style.color = colors.textMuted}>
             Log In
           </Link>
 
@@ -59,11 +61,11 @@ const Navbar: React.FC = () => {
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 padding: '10px 24px', borderRadius: '9999px',
-                backgroundColor: '#ffffff', border: 'none',
-                color: '#020617', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
+                backgroundColor: colors.emerald, border: 'none',
+                color: colors.bgPage, fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
                 cursor: 'pointer'
               }}
-              whileHover={{ backgroundColor: '#22d3ee', y: -2 }}
+              whileHover={{ backgroundColor: colors.emeraldLight, y: -2 }}
               transition={{ duration: 0.2 }}
             >
               Get Protocol

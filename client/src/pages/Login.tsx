@@ -4,37 +4,29 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Mail } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
-const ECGIcon = ({ size = 24, color = "#e8b86d" }) => (
+// ─── ECG Icon ─────────────────────────────────────────────────────────────────
+const ECGIcon = ({ size = 24, color = '#10b981' }) => (
   <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    width={size} height={size}
+    viewBox="0 0 24 24" fill="none"
     style={{ overflow: 'visible' }}
   >
     <polyline
       points="1,12 5,12 7,6 9,18 11,4 13,20 15,8 17,12 23,12"
-      stroke={color}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-      strokeDasharray="60"
-      strokeDashoffset="60"
+      stroke={color} strokeWidth="2"
+      strokeLinecap="round" strokeLinejoin="round"
+      strokeDasharray="60" strokeDashoffset="60"
     >
       <animate
         attributeName="stroke-dashoffset"
-        from="60"
-        to="-60"
-        dur="1.5s"
-        repeatCount="indefinite"
-        calcMode="linear"
+        from="60" to="-60"
+        dur="1.5s" repeatCount="indefinite" calcMode="linear"
       />
     </polyline>
   </svg>
 );
 
+// ─── Login ────────────────────────────────────────────────────────────────────
 const Login: React.FC = () => {
   const { colors } = useTheme();
   const [emailFocus, setEmailFocus] = useState(false);
@@ -45,8 +37,6 @@ const Login: React.FC = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate API authentication delay
     setTimeout(() => {
       localStorage.setItem('isAuthenticated', 'true');
       setIsLoading(false);
@@ -57,200 +47,326 @@ const Login: React.FC = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+      position: 'relative', overflow: 'hidden',
       backgroundColor: colors.bgPage,
       color: colors.textPrimary,
-      fontFamily: "'DM Sans', sans-serif"
+      fontFamily: "'DM Sans', sans-serif",
     }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700;9..40,900&family=DM+Mono:wght@400;500&display=swap');
 
-      {/* --- INJECTED CSS FOR AUTOFILL RESET --- */}
-      <style>
-        {`
-          /* Input reset to prevent browser autofill styling from breaking the dark theme */
-          input:-webkit-autofill,
-          input:-webkit-autofill:hover, 
-          input:-webkit-autofill:focus, 
-          input:-webkit-autofill:active{
-              -webkit-box-shadow: 0 0 0 30px ${colors.bgPage} inset !important;
-              -webkit-text-fill-color: ${colors.textPrimary} !important;
-          }
-        `}
-      </style>
+        /* Autofill reset — prevents browser from overriding dark bg */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 30px ${colors.bgCard} inset !important;
+          -webkit-text-fill-color: ${colors.textPrimary} !important;
+        }
 
-      {/* --- AMBIENT BACKGROUND GLOW --- */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', top: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.gold}0a`, filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', bottom: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.rose}0a`, filter: 'blur(100px)' }} />
+        .return-link { transition: color 0.2s; }
+        .return-link:hover { color: ${colors.emerald} !important; }
+
+        .signup-link { transition: color 0.2s; }
+        .signup-link:hover { color: ${colors.emeraldLight} !important; }
+      `}</style>
+
+      {/* ── Ambient blobs ──────────────────────────────────────────────────── */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+        {/* Top-left — emerald */}
+        <div style={{
+          position: 'absolute', top: '5%', left: '5%',
+          width: 560, height: 560, borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 70%)',
+        }} />
+        {/* Bottom-right — teal */}
+        <div style={{
+          position: 'absolute', bottom: '5%', right: '5%',
+          width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(13,148,136,0.06) 0%, transparent 70%)',
+        }} />
+        {/* Subtle grid */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `
+            linear-gradient(${colors.borderSubtle} 1px, transparent 1px),
+            linear-gradient(90deg, ${colors.borderSubtle} 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }} />
       </div>
 
-      {/* --- NEURAL CIRCUITS --- */}
+      {/* ── Circuit line animations ─────────────────────────────────────────── */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <svg
+          style={{ width: '100%', height: '100%', opacity: 0.5 }}
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="xMidYMid slice"
+        >
           <defs>
-            <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+            <linearGradient id="glowEmerald" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="transparent" />
-              <stop offset="20%" stopColor={colors.gold} stopOpacity="0.8" />
+              <stop offset="20%" stopColor={colors.emerald} stopOpacity="0.7" />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
-            <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
+            <linearGradient id="glowTeal" x1="100%" y1="0%" x2="0%" y2="0%">
               <stop offset="0%" stopColor="transparent" />
-              <stop offset="20%" stopColor={colors.rose} stopOpacity="0.8" />
+              <stop offset="20%" stopColor={colors.teal} stopOpacity="0.7" />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
           </defs>
 
-          {/* Left Side Waves */}
-          <motion.path d="M -50 200 C 200 200, 400 450, 720 450" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-          <motion.path d="M -50 750 C 300 750, 500 550, 720 550" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-
-          {/* Right Side Waves */}
-          <motion.path d="M 1490 150 C 1200 150, 1000 450, 720 450" fill="transparent" stroke="url(#glowRight)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
-          <motion.path d="M 1490 800 C 1100 800, 900 550, 720 550" fill="transparent" stroke="url(#glowRight)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+          <motion.path
+            d="M -50 200 C 200 200, 400 450, 720 450"
+            fill="transparent" stroke="url(#glowEmerald)"
+            strokeWidth="1.5" strokeLinecap="round"
+            animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <motion.path
+            d="M -50 750 C 300 750, 500 550, 720 550"
+            fill="transparent" stroke="url(#glowEmerald)"
+            strokeWidth="1" strokeLinecap="round"
+            animate={{ pathLength: [0, 1], opacity: [0, 0.5, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          />
+          <motion.path
+            d="M 1490 150 C 1200 150, 1000 450, 720 450"
+            fill="transparent" stroke="url(#glowTeal)"
+            strokeWidth="1.5" strokeLinecap="round"
+            animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+          />
+          <motion.path
+            d="M 1490 800 C 1100 800, 900 550, 720 550"
+            fill="transparent" stroke="url(#glowTeal)"
+            strokeWidth="1" strokeLinecap="round"
+            animate={{ pathLength: [0, 1], opacity: [0, 0.5, 0] }}
+            transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
         </svg>
       </div>
 
-      {/* --- HEADER --- */}
-      <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '2rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em' }}>
-          <ECGIcon size={24} color={colors.gold} />
+      {/* ── Header ─────────────────────────────────────────────────────────── */}
+      <header style={{
+        position: 'relative', zIndex: 10,
+        width: '100%', padding: '1.75rem 5%',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 9,
+          fontWeight: 900, fontSize: '1.05rem',
+          color: colors.textPrimary,
+          fontFamily: "'DM Mono', monospace",
+          letterSpacing: '0.08em',
+        }}>
+          <ECGIcon size={22} color={colors.emerald} />
           NUTRICORE
         </div>
-        <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em' }}>
+        <Link
+          to="/"
+          className="return-link"
+          style={{
+            textDecoration: 'none', fontSize: '0.68rem', fontWeight: 700,
+            color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em',
+          }}
+        >
           Return Home
         </Link>
       </header>
 
-      {/* --- LOGIN TERMINAL --- */}
-      <main style={{ position: 'relative', zIndex: 10, flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      {/* ── Login card ─────────────────────────────────────────────────────── */}
+      <main style={{
+        position: 'relative', zIndex: 10,
+        flexGrow: 1, display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '2rem',
+      }}>
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
           style={{
-            width: '100%',
-            maxWidth: '440px',
-            padding: '3rem',
+            width: '100%', maxWidth: 420,
+            padding: '2.75rem',
             backgroundColor: colors.bgCard,
-            borderRadius: '24px',
-            border: `1px solid ${colors.borderDefault}`,
+            borderRadius: 20,
+            border: `0.5px solid ${colors.borderDefault}`,
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '2.5rem'
+            display: 'flex', flexDirection: 'column', gap: '2.25rem',
+            position: 'relative', overflow: 'hidden',
           }}
         >
-          {/* Titles */}
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: colors.textPrimary }}>
-              Login
+          {/* Subtle top glow inside card */}
+          <div style={{
+            position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)',
+            width: '70%', height: 120,
+            background: 'radial-gradient(ellipse, rgba(16,185,129,0.08) 0%, transparent 70%)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Title */}
+          <div style={{ textAlign: 'center', position: 'relative' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 48, height: 48, borderRadius: '50%',
+              background: colors.emeraldTint,
+              border: `0.5px solid ${colors.emeraldBorder}`,
+              marginBottom: '1rem',
+            }}>
+              <ECGIcon size={20} color={colors.emerald} />
+            </div>
+            <h1 style={{
+              fontSize: '1.75rem', fontWeight: 900, margin: '0 0 0.4rem',
+              letterSpacing: '-0.03em', color: colors.textPrimary,
+            }}>
+              Welcome back
             </h1>
-            <p style={{ fontSize: '0.9rem', color: colors.textMuted, margin: 0 }}>
-              Authenticate to access your bio-dashboard.
+            <p style={{ fontSize: '0.85rem', color: colors.textMuted, margin: 0, lineHeight: 1.6 }}>
+              Authenticate to access your dashboard.
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-            {/* Email Field */}
+            {/* Email */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
-                Email ID
+              <label style={{
+                fontSize: '0.62rem', fontWeight: 700,
+                color: colors.textMuted, textTransform: 'uppercase',
+                letterSpacing: '0.18em', paddingLeft: 2,
+                fontFamily: "'DM Mono', monospace",
+              }}>
+                Email
               </label>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
-                  <Mail size={18} />
+                <div style={{
+                  position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                  color: emailFocus ? colors.emerald : colors.textMuted,
+                  transition: 'color 0.2s', display: 'flex',
+                }}>
+                  <Mail size={16} />
                 </div>
                 <input
-                  type="email"
-                  required
-                  placeholder="user@neural-link.com"
+                  type="email" required
+                  placeholder="you@example.com"
                   onFocus={() => setEmailFocus(true)}
                   onBlur={() => setEmailFocus(false)}
                   disabled={isLoading}
                   style={{
-                    width: '100%', padding: '16px 16px 16px 48px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.goldBorder : colors.borderSubtle}`,
-                    borderRadius: '12px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease',
-                    opacity: isLoading ? 0.5 : 1
+                    width: '100%', padding: '13px 14px 13px 42px',
+                    background: colors.bgElevated,
+                    border: `0.5px solid ${emailFocus ? colors.emeraldBorder : colors.borderDefault}`,
+                    borderRadius: 10, color: colors.textPrimary,
+                    fontSize: '0.88rem', outline: 'none',
+                    transition: 'border-color 0.2s',
+                    opacity: isLoading ? 0.5 : 1,
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
                 />
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.65rem', fontWeight: 800, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.2em', paddingLeft: '0.25rem' }}>
-                Password
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: 2 }}>
+                <label style={{
+                  fontSize: '0.62rem', fontWeight: 700,
+                  color: colors.textMuted, textTransform: 'uppercase',
+                  letterSpacing: '0.18em',
+                  fontFamily: "'DM Mono', monospace",
+                }}>
+                  Password
+                </label>
+                <a href="#" style={{
+                  fontSize: '0.65rem', color: colors.teal,
+                  textDecoration: 'none', fontWeight: 600,
+                  transition: 'color 0.2s',
+                }}
+                  onMouseEnter={e => ((e.currentTarget as HTMLAnchorElement).style.color = colors.emerald)}
+                  onMouseLeave={e => ((e.currentTarget as HTMLAnchorElement).style.color = colors.teal)}
+                >
+                  Forgot password?
+                </a>
+              </div>
               <div style={{ position: 'relative' }}>
-                <div style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.gold : colors.textMuted, transition: 'color 0.3s' }}>
-                  <Lock size={18} />
+                <div style={{
+                  position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+                  color: passFocus ? colors.emerald : colors.textMuted,
+                  transition: 'color 0.2s', display: 'flex',
+                }}>
+                  <Lock size={16} />
                 </div>
                 <input
-                  type="password"
-                  required
+                  type="password" required
                   placeholder="••••••••"
                   onFocus={() => setPassFocus(true)}
                   onBlur={() => setPassFocus(false)}
                   disabled={isLoading}
                   style={{
-                    width: '100%', padding: '16px 16px 16px 48px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.goldBorder : colors.borderSubtle}`,
-                    borderRadius: '12px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.2em',
-                    opacity: isLoading ? 0.5 : 1
+                    width: '100%', padding: '13px 14px 13px 42px',
+                    background: colors.bgElevated,
+                    border: `0.5px solid ${passFocus ? colors.emeraldBorder : colors.borderDefault}`,
+                    borderRadius: 10, color: colors.textPrimary,
+                    fontSize: '0.9rem', outline: 'none', letterSpacing: '0.15em',
+                    transition: 'border-color 0.2s',
+                    opacity: isLoading ? 0.5 : 1,
+                    fontFamily: "'DM Sans', sans-serif",
                   }}
                 />
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <motion.button
               type="submit"
               disabled={isLoading}
+              whileHover={!isLoading ? { y: -1 } : {}}
+              whileTap={!isLoading ? { scale: 0.97 } : {}}
+              transition={{ duration: 0.15 }}
               style={{
-                marginTop: '1rem',
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-                padding: '18px 0', width: '100%', borderRadius: '9999px',
-                backgroundColor: colors.goldTint, border: `1px solid ${colors.goldBorder}`,
-                color: colors.gold, fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.2em', textTransform: 'uppercase',
-                cursor: isLoading ? 'not-allowed' : 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                transition: 'all 0.3s ease'
+                marginTop: '0.5rem',
+                display: 'inline-flex', alignItems: 'center',
+                justifyContent: 'center', gap: 10,
+                padding: '14px 0', width: '100%', borderRadius: 10,
+                background: isLoading ? colors.bgElevated : colors.emerald,
+                border: `0.5px solid ${isLoading ? colors.borderDefault : colors.emeraldBorder}`,
+                color: isLoading ? colors.textMuted : colors.bgPage,
+                fontSize: '0.78rem', fontWeight: 800,
+                letterSpacing: '0.16em', textTransform: 'uppercase',
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                transition: 'background 0.2s, color 0.2s, border-color 0.2s',
+                fontFamily: "'DM Sans', sans-serif",
               }}
-              whileHover={!isLoading ? {
-                backgroundColor: colors.goldGlow,
-                borderColor: colors.gold,
-                y: -2
-              } : {}}
-              transition={{ duration: 0.2 }}
             >
               {isLoading ? (
                 <>
-                  Authenticating...
-                  <ECGIcon size={18} color={colors.gold} />
+                  Authenticating
+                  <ECGIcon size={16} color={colors.emerald} />
                 </>
               ) : (
                 <>
                   Authenticate
-                  <ArrowRight size={18} color={colors.gold} />
+                  <ArrowRight size={16} />
                 </>
               )}
             </motion.button>
           </form>
 
-          {/* Footer Link */}
+          {/* Sign up link */}
           <div style={{ textAlign: 'center', fontSize: '0.8rem', color: colors.textMuted }}>
-            New Entity?{' '}
-            <Link to="/signup" style={{ color: colors.gold, fontWeight: 700, textDecoration: 'none' }}>
-              Initialize Profile
+            New here?{' '}
+            <Link
+              to="/signup"
+              className="signup-link"
+              style={{ color: colors.emerald, fontWeight: 700, textDecoration: 'none', transition: 'color 0.2s' }}
+            >
+              Create account
             </Link>
           </div>
-
         </motion.div>
       </main>
     </div>
