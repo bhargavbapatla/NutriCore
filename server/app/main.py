@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 import app.models
 from app.database import engine, get_db
-
+from app.api.routes.api import router as api_router
 
 
 app = FastAPI(title="NutriCore API")
@@ -30,3 +30,6 @@ async def health_check(db: Session = Depends(get_db)):
         return {"status": "healthy", "database": "Connected to Supabase PostgreSQL!"}
     except Exception as e:
         return {"status": "unhealthy", "database": f"Connection failed: {str(e)}"}
+
+
+app.include_router(api_router)
