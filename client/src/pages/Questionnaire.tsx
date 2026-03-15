@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useFormik, FormikProvider } from 'formik';
+import * as Yup from 'yup';
 
 // ─── SVG Icons — 20×20, stroke-based, Lucide-style ────────────────────────────
 
@@ -78,22 +80,6 @@ const IconRun = ({ color }: { color: string }) => (
 const IconZap = ({ color }: { color: string }) => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-);
-
-const IconScale = ({ color }: { color: string }) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l4 12h10l4-12" />
-        <path d="M3 9h18" />
-        <path d="M12 3v6" />
-        <circle cx="12" cy="3" r="1" />
-        <path d="M8 21h8" />
-    </svg>
-);
-
-const IconMoon = ({ color }: { color: string }) => (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
 );
 
@@ -356,8 +342,38 @@ const Questionnaire: React.FC = () => {
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const [direction, setDirection] = useState(1);
-    const [answers, setAnswers] = useState<AnswerMap>({});
     const [done, setDone] = useState(false);
+
+    // Initial Values
+    const initialValues: AnswerMap = {
+        goal: undefined as any,
+        activity: undefined as any,
+        weight: 70,
+        sleep: 7,
+        meals: undefined as any,
+        restrictions: [0] // Default to 'None'
+    };
+
+    // Validation Schema
+    const validationSchema = Yup.object().shape({
+        goal: Yup.number().required('Purpose is required'),
+        activity: Yup.number().required('Activity level is required'),
+        weight: Yup.number().min(40).max(160).required(),
+        sleep: Yup.number().min(1).max(10).required(),
+        meals: Yup.number().required('Meal frequency is required'),
+        restrictions: Yup.array().of(Yup.number()).min(1, 'Select at least one option')
+    });
+
+    const formik = useFormik({
+        initialValues,
+        validationSchema,
+        onSubmit: (values) => {
+            console.log('Questionnaire Data:', values);
+            setDone(true);
+        }
+    });
+
+    const { values, setFieldValue } = formik;
 
     const step = STEPS[current];
     const progress = (current / STEPS.length) * 100;
@@ -369,22 +385,30 @@ const Questionnaire: React.FC = () => {
     };
 
     const handleNext = () => {
-        if (current === STEPS.length - 1) { setDone(true); return; }
+        if (current === STEPS.length - 1) { 
+            formik.handleSubmit();
+            return; 
+        }
         setDirection(1);
         setCurrent(c => c + 1);
     };
 
-    const setAnswer = (key: string, val: number) => setAnswers(prev => ({ ...prev, [key]: val }));
-    const sliderVal = (key: string, def: number) => answers[key] !== undefined ? (answers[key] as number) : def;
+    const setAnswer = (key: string, val: number) => setFieldValue(key, val);
+    const sliderVal = (key: string, def: number) => values[key] !== undefined ? (values[key] as number) : def;
     const labelOf = (arr: string[], idx: number | undefined) => idx !== undefined ? arr[idx] : '—';
 
     const toggleMulti = (key: string, val: number) => {
-        setAnswers(prev => {
-            const cur = (prev[key] as number[]) || [];
-            if (val === 0) return { ...prev, [key]: [0] };
-            const without0 = cur.filter(v => v !== 0);
-            return { ...prev, [key]: without0.includes(val) ? without0.filter(v => v !== val) : [...without0, val] };
-        });
+        const cur = (values[key] as number[]) || [];
+        if (val === 0) {
+            setFieldValue(key, [0]);
+            return;
+        }
+        const without0 = cur.filter(v => v !== 0);
+        const nextVal = without0.includes(val) 
+            ? without0.filter(v => v !== val) 
+            : [...without0, val];
+        
+        setFieldValue(key, nextVal.length === 0 ? [0] : nextVal);
     };
 
     const goalLabels = (STEPS[0] as OptionsStep).options.map(o => o.label);
@@ -443,138 +467,140 @@ const Questionnaire: React.FC = () => {
 
             {/* Main */}
             <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 10 }}>
-                <AnimatePresence mode="wait" custom={direction}>
-                    <motion.div
-                        key={done ? 'summary' : current}
-                        custom={direction}
-                        variants={variants}
-                        initial="enter" animate="center" exit="exit"
-                        transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-                        style={{
-                            width: '100%', maxWidth: 500,
-                            background: colors.bgCard,
-                            border: `0.5px solid ${colors.borderDefault}`,
-                            borderRadius: 18, padding: '2.75rem',
-                        }}
-                    >
-                        {done ? (
-                            <>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                                    <ECGIcon color={colors.emerald} />
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Profile Initialized</span>
-                                </div>
-                                <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: colors.textPrimary, letterSpacing: '-0.03em', margin: '0 0 6px' }}>Intelligence Summary</h1>
-                                <p style={{ fontSize: '0.85rem', color: colors.textMuted, margin: '0 0 2rem', lineHeight: 1.6 }}>Review your protocol baselines before we activate.</p>
+                <FormikProvider value={formik}>
+                    <AnimatePresence mode="wait" custom={direction}>
+                        <motion.div
+                            key={done ? 'summary' : current}
+                            custom={direction}
+                            variants={variants}
+                            initial="enter" animate="center" exit="exit"
+                            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                            style={{
+                                width: '100%', maxWidth: 500,
+                                background: colors.bgCard,
+                                border: `0.5px solid ${colors.borderDefault}`,
+                                borderRadius: 18, padding: '2.75rem',
+                            }}
+                        >
+                            {done ? (
+                                <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                                        <ECGIcon color={colors.emerald} />
+                                        <span style={{ fontSize: 10, fontWeight: 700, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', fontFamily: "'DM Mono', monospace" }}>Profile Initialized</span>
+                                    </div>
+                                    <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: colors.textPrimary, letterSpacing: '-0.03em', margin: '0 0 6px' }}>Intelligence Summary</h1>
+                                    <p style={{ fontSize: '0.85rem', color: colors.textMuted, margin: '0 0 2rem', lineHeight: 1.6 }}>Review your protocol baselines before we activate.</p>
 
-                                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                    {[
-                                        { k: 'Primary Objective', v: labelOf(goalLabels, answers.goal as number) },
-                                        { k: 'Activity Level', v: labelOf(actLabels, answers.activity as number) },
-                                        { k: 'Body Mass', v: `${parseFloat(String(answers.weight || 70)).toFixed(1)} kg` },
-                                        { k: 'Sleep Quality', v: `${Math.round(Number(answers.sleep || 7))} / 10` },
-                                        { k: 'Eating Pattern', v: labelOf(mealLabels, answers.meals as number) },
-                                        { k: 'Dietary Needs', v: ((answers.restrictions as number[]) || []).map(i => dietLabels[i]).join(', ') || 'None' },
-                                    ].map(row => (
-                                        <div key={row.k} style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 0', borderBottom: `0.5px solid ${colors.borderSubtle}`, fontSize: '0.85rem' }}>
-                                            <span style={{ color: colors.textMuted, fontWeight: 500 }}>{row.k}</span>
-                                            <span style={{ color: colors.emerald, fontWeight: 700 }}>{row.v}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <button
-                                    onClick={() => navigate('/dashboard')}
-                                    style={{
-                                        marginTop: '2rem', width: '100%', padding: '14px',
-                                        background: colors.emerald, color: colors.bgPage,
-                                        fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
-                                        border: 'none', borderRadius: 10, cursor: 'pointer',
-                                        transition: 'background 0.18s',
-                                    }}
-                                    onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight)}
-                                    onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = colors.emerald)}
-                                >
-                                    Activate Protocol →
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 10, fontFamily: "'DM Mono', monospace" }}>
-                                    Step {current + 1} of {STEPS.length}
-                                </div>
-                                <h1 style={{ fontSize: '1.65rem', fontWeight: 900, color: colors.textPrimary, letterSpacing: '-0.03em', margin: '0 0 8px' }}>{step.title}</h1>
-                                <p style={{ fontSize: '0.88rem', color: colors.textMuted, margin: '0 0 2rem', lineHeight: 1.65 }}>{step.sub}</p>
-
-                                {step.type === 'options' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '2rem' }}>
-                                        {step.options.map((o, i) => (
-                                            <OptionCard key={i} icon={o.icon} label={o.label} desc={o.desc}
-                                                colors={colors} selected={answers[step.key] === i} onClick={() => setAnswer(step.key, i)} />
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        {[
+                                            { k: 'Primary Objective', v: labelOf(goalLabels, values.goal as number) },
+                                            { k: 'Activity Level', v: labelOf(actLabels, values.activity as number) },
+                                            { k: 'Body Mass', v: `${parseFloat(String(values.weight || 70)).toFixed(1)} kg` },
+                                            { k: 'Sleep Quality', v: `${Math.round(Number(values.sleep || 7))} / 10` },
+                                            { k: 'Eating Pattern', v: labelOf(mealLabels, values.meals as number) },
+                                            { k: 'Dietary Needs', v: ((values.restrictions as number[]) || []).map(i => dietLabels[i]).join(', ') || 'None' },
+                                        ].map(row => (
+                                            <div key={row.k} style={{ display: 'flex', justifyContent: 'space-between', padding: '13px 0', borderBottom: `0.5px solid ${colors.borderSubtle}`, fontSize: '0.85rem' }}>
+                                                <span style={{ color: colors.textMuted, fontWeight: 500 }}>{row.k}</span>
+                                                <span style={{ color: colors.emerald, fontWeight: 700 }}>{row.v}</span>
+                                            </div>
                                         ))}
                                     </div>
-                                )}
 
-                                {step.type === 'tiles' && (
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '2rem' }}>
-                                        {step.options.map((o, i) => (
-                                            <TileCard key={i} icon={o.icon} label={o.label} sub={o.sub}
-                                                colors={colors} selected={answers[step.key] === i} onClick={() => setAnswer(step.key, i)} />
-                                        ))}
+                                    <button
+                                        onClick={() => navigate('/dashboard')}
+                                        style={{
+                                            marginTop: '2rem', width: '100%', padding: '14px',
+                                            background: colors.emerald, color: colors.bgPage,
+                                            fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
+                                            border: 'none', borderRadius: 10, cursor: 'pointer',
+                                            transition: 'background 0.18s',
+                                        }}
+                                        onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight)}
+                                        onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = colors.emerald)}
+                                    >
+                                        Activate Protocol →
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <div style={{ fontSize: 10, fontWeight: 700, color: colors.emerald, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 10, fontFamily: "'DM Mono', monospace" }}>
+                                        Step {current + 1} of {STEPS.length}
                                     </div>
-                                )}
+                                    <h1 style={{ fontSize: '1.65rem', fontWeight: 900, color: colors.textPrimary, letterSpacing: '-0.03em', margin: '0 0 8px' }}>{step.title}</h1>
+                                    <p style={{ fontSize: '0.88rem', color: colors.textMuted, margin: '0 0 2rem', lineHeight: 1.65 }}>{step.sub}</p>
 
-                                {step.type === 'multi' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '2rem' }}>
-                                        {step.options.map((o, i) => (
-                                            <OptionCard key={i} icon={o.icon} label={o.label} desc={o.desc}
-                                                colors={colors}
-                                                selected={((answers[step.key] as number[]) || []).includes(i)}
-                                                onClick={() => toggleMulti(step.key, i)} />
-                                        ))}
-                                    </div>
-                                )}
-
-                                {step.type === 'slider' && (
-                                    <div style={{ marginBottom: '2rem' }}>
-                                        <div style={{ fontSize: '3rem', fontWeight: 900, color: colors.textPrimary, marginBottom: 20, letterSpacing: '-0.04em', fontFamily: "'DM Mono', monospace" }}>
-                                            {step.unit === 'kg'
-                                                ? parseFloat(String(sliderVal(step.key, step.default))).toFixed(1)
-                                                : Math.round(sliderVal(step.key, step.default))}
-                                            <span style={{ fontSize: '1.1rem', fontWeight: 400, color: colors.textMuted, marginLeft: 8 }}>{step.unit}</span>
+                                    {step.type === 'options' && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '2rem' }}>
+                                            {step.options.map((o, i) => (
+                                                <OptionCard key={i} icon={o.icon} label={o.label} desc={o.desc}
+                                                    colors={colors} selected={values[step.key] === i} onClick={() => setAnswer(step.key, i)} />
+                                            ))}
                                         </div>
-                                        <input
-                                            type="range" min={step.min} max={step.max} step={step.step}
-                                            value={sliderVal(step.key, step.default)}
-                                            onChange={e => setAnswer(step.key, parseFloat(e.target.value))}
-                                            style={{ marginBottom: 12 }}
-                                        />
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: colors.textMuted, fontWeight: 600, letterSpacing: '0.06em', fontFamily: "'DM Mono', monospace" }}>
-                                            <span>{step.labels[0]}</span><span>{step.labels[1]}</span>
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                <button
-                                    onClick={handleNext}
-                                    disabled={!canProceed(step, answers)}
-                                    style={{
-                                        width: '100%', padding: '14px',
-                                        background: canProceed(step, answers) ? colors.emerald : colors.bgElevated,
-                                        color: canProceed(step, answers) ? colors.bgPage : colors.textMuted,
-                                        fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
-                                        border: `0.5px solid ${canProceed(step, answers) ? colors.emeraldBorder : colors.borderSubtle}`,
-                                        borderRadius: 10, cursor: canProceed(step, answers) ? 'pointer' : 'not-allowed',
-                                        transition: 'all 0.18s',
-                                    }}
-                                    onMouseEnter={e => { if (canProceed(step, answers)) (e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight; }}
-                                    onMouseLeave={e => { if (canProceed(step, answers)) (e.currentTarget as HTMLButtonElement).style.background = colors.emerald; }}
-                                >
-                                    {current === STEPS.length - 1 ? 'Build My Plan →' : 'Continue →'}
-                                </button>
-                            </>
-                        )}
-                    </motion.div>
-                </AnimatePresence>
+                                    {step.type === 'tiles' && (
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: '2rem' }}>
+                                            {step.options.map((o, i) => (
+                                                <TileCard key={i} icon={o.icon} label={o.label} sub={o.sub}
+                                                    colors={colors} selected={values[step.key] === i} onClick={() => setAnswer(step.key, i)} />
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {step.type === 'multi' && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: '2rem' }}>
+                                            {step.options.map((o, i) => (
+                                                <OptionCard key={i} icon={o.icon} label={o.label} desc={o.desc}
+                                                    colors={colors}
+                                                    selected={((values[step.key] as number[]) || []).includes(i)}
+                                                    onClick={() => toggleMulti(step.key, i)} />
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {step.type === 'slider' && (
+                                        <div style={{ marginBottom: '2rem' }}>
+                                            <div style={{ fontSize: '3rem', fontWeight: 900, color: colors.textPrimary, marginBottom: 20, letterSpacing: '-0.04em', fontFamily: "'DM Mono', monospace" }}>
+                                                {step.unit === 'kg'
+                                                    ? parseFloat(String(sliderVal(step.key, step.default))).toFixed(1)
+                                                    : Math.round(sliderVal(step.key, step.default))}
+                                                <span style={{ fontSize: '1.1rem', fontWeight: 400, color: colors.textMuted, marginLeft: 8 }}>{step.unit}</span>
+                                            </div>
+                                            <input
+                                                type="range" min={step.min} max={step.max} step={step.step}
+                                                value={sliderVal(step.key, step.default)}
+                                                onChange={e => setAnswer(step.key, parseFloat(e.target.value))}
+                                                style={{ marginBottom: 12 }}
+                                            />
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: colors.textMuted, fontWeight: 600, letterSpacing: '0.06em', fontFamily: "'DM Mono', monospace" }}>
+                                                <span>{step.labels[0]}</span><span>{step.labels[1]}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={handleNext}
+                                        disabled={!canProceed(step)}
+                                        style={{
+                                            width: '100%', padding: '14px',
+                                            background: canProceed(step) ? colors.emerald : colors.bgElevated,
+                                            color: canProceed(step) ? colors.bgPage : colors.textMuted,
+                                            fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
+                                            border: `0.5px solid ${canProceed(step) ? colors.emeraldBorder : colors.borderSubtle}`,
+                                            borderRadius: 10, cursor: canProceed(step) ? 'pointer' : 'not-allowed',
+                                            transition: 'all 0.18s',
+                                        }}
+                                        onMouseEnter={e => { if (canProceed(step)) (e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight; }}
+                                        onMouseLeave={e => { if (canProceed(step)) (e.currentTarget as HTMLButtonElement).style.background = colors.emerald; }}
+                                    >
+                                        {current === STEPS.length - 1 ? 'Build My Plan →' : 'Continue →'}
+                                    </button>
+                                </>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </FormikProvider>
             </main>
         </div>
     );
