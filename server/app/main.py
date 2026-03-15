@@ -1,10 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+import app.models
+from app.database import engine, get_db
 
-# Initialize the Express-like app
-app = FastAPI(title="NutriMind API")
 
-# Allow your React frontend (Vite's default port 5173) to communicate with this backend
+
+app = FastAPI(title="NutriCore API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"], 
@@ -13,11 +17,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create a basic GET route (like app.get('/') in Express)
 @app.get("/")
 async def root():
-    return {"message": "NutriMind API is running!"}
+    return {"message": "NutriCore API is running!"}
 
+# Health check route to verify Supabase connection
 @app.get("/health")
-async def health_check():
-    return {"status": "healthy", "database": "Not connected yet"}
+async def health_check(db: Session = Depends(get_db)):
+    try:
+        # Execute a simple raw SQL query
+        db.execute(text("SELECT 1"))
+        return {"status": "healthy", "database": "Connected to Supabase PostgreSQL!"}
+    except Exception as e:
+        return {"status": "unhealthy", "database": f"Connection failed: {str(e)}"}
