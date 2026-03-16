@@ -1,4 +1,4 @@
-import React, { Fragment, Suspense, lazy } from 'react';
+import React, { Fragment, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';

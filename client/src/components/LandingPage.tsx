@@ -5,7 +5,6 @@ import { ArrowRight, MoveRight } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import Navbar from './Navbar';
 import { useTheme } from '../context/ThemeContext';
 
 gsap.registerPlugin(ScrollTrigger);

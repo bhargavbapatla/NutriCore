@@ -7,7 +7,6 @@ import {
   Send, Sparkles, Plus,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { logout } from '@/api/authentication';
 import useAuthStore from '@/store/authStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
