@@ -3,10 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Activity, Lock, Mail, User } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { signup } from '../api/authentication';
 import { toast } from 'sonner';
 import { useFormik, FormikProvider, Field } from 'formik';
 import * as Yup from 'yup';
+import useAuthStore from '../store/authStore';
 
 // ─── Reusable field wrapper ────────────────────────────────────────────────────
 // Separates the input+icon row from the error message so the icon never
@@ -98,7 +98,7 @@ const InputField: React.FC<{
 const Signup: React.FC = () => {
     const { colors } = useTheme();
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const { signupStack, isLoading } = useAuthStore();
 
     const [nameFocus, setNameFocus] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
@@ -116,12 +116,10 @@ const Signup: React.FC = () => {
         initialValues: { name: '', email: '', password: '', confirmPassword: '' },
         validationSchema,
         onSubmit: async (values) => {
-            setIsLoading(true);
             try {
                 const { confirmPassword, ...signupData } = values;
-                const response = await signup(signupData);
-                if (response.status === 200) toast.success(response.data.message || 'Account created');
-                localStorage.setItem('isAuthenticated', 'true');
+                await signupStack(signupData);
+                toast.success('Account created successfully!');
                 navigate('/questionnaire');
             } catch (err: any) {
                 let msg = 'Failed to create account.';
@@ -129,8 +127,6 @@ const Signup: React.FC = () => {
                     msg = Array.isArray(err.detail) ? err.detail.map((e: any) => e.msg).join(', ') : err.detail;
                 } else if (err.message) msg = err.message;
                 toast.error('Signup Failed', { description: msg });
-            } finally {
-                setIsLoading(false);
             }
         },
     });

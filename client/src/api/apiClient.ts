@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// The base URL for the server. In a real application, this should be in an environment variable.
 const BASE_URL = 'http://localhost:8000';
 
 const apiClient = axios.create({

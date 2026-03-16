@@ -5,6 +5,8 @@ import { ArrowRight, Lock, Mail } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useFormik, FormikProvider, Field } from 'formik';
 import * as Yup from 'yup';
+import useAuthStore from '../store/authStore';
+import { toast } from 'sonner';
 
 // ─── ECG Icon ─────────────────────────────────────────────────────────────────
 const ECGIcon = ({ size = 24, color = '#10b981' }) => (
@@ -97,7 +99,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { loginStack, isLoading } = useAuthStore();
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -105,13 +107,14 @@ const Login: React.FC = () => {
       email: Yup.string().email('Invalid email').required('Email is required'),
       password: Yup.string().required('Password is required'),
     }),
-    onSubmit: async () => {
-      setIsLoading(true);
-      setTimeout(() => {
-        localStorage.setItem('isAuthenticated', 'true');
-        setIsLoading(false);
+    onSubmit: async (values) => {
+      try {
+        await loginStack(values);
+        toast.success('Welcome back!');
         navigate('/questionnaire');
-      }, 2000);
+      } catch (err: any) {
+        toast.error('Login Failed', { description: typeof err === 'string' ? err : err.detail || 'Invalid credentials' });
+      }
     },
   });
 

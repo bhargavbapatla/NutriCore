@@ -10,9 +10,6 @@ import os
 load_dotenv()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-async def check_email_is_taken(email: str, db: Session):
-    return db.query(models.User).filter(models.User.email == email).first()
-
 async def create_user(request: schemas.Createuser, db: Session):
     hashed_password = pwd_context.hash(request.password)
     new_user = models.User(
@@ -35,3 +32,19 @@ def create_access_token(data: dict):
     # Mathematically sign the token using your secret key
     encoded_jwt = jwt.encode(to_encode, os.getenv("SECRET_KEY"), algorithm=os.getenv("ALGORITHM"))
     return encoded_jwt
+
+def verify_password(plain_password: str, hashed_password: str):
+    return pwd_context.verify(plain_password, hashed_password)
+
+async def get_user_by_email(email: str, db: Session):
+    return db.query(models.User).filter(models.User.email == email).first()
+
+def get_current_user(token: str, db: Session):
+    try:
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            return None
+        return db.query(models.User).filter(models.User.id == int(user_id)).first()
+    except Exception:
+        return None

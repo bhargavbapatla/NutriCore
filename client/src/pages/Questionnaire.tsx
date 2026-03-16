@@ -255,6 +255,7 @@ const STEPS: Step[] = [
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const canProceed = (step: Step, answers: AnswerMap): boolean => {
+    if (!answers || !step) return false;
     if (step.type === 'slider') return true;
     if (step.type === 'multi') return ((answers[step.key] as number[]) || []).length > 0;
     return answers[step.key] !== undefined;
@@ -385,9 +386,9 @@ const Questionnaire: React.FC = () => {
     };
 
     const handleNext = () => {
-        if (current === STEPS.length - 1) { 
+        if (current === STEPS.length - 1) {
             formik.handleSubmit();
-            return; 
+            return;
         }
         setDirection(1);
         setCurrent(c => c + 1);
@@ -404,10 +405,10 @@ const Questionnaire: React.FC = () => {
             return;
         }
         const without0 = cur.filter(v => v !== 0);
-        const nextVal = without0.includes(val) 
-            ? without0.filter(v => v !== val) 
+        const nextVal = without0.includes(val)
+            ? without0.filter(v => v !== val)
             : [...without0, val];
-        
+
         setFieldValue(key, nextVal.length === 0 ? [0] : nextVal);
     };
 
@@ -581,18 +582,18 @@ const Questionnaire: React.FC = () => {
 
                                     <button
                                         onClick={handleNext}
-                                        disabled={!canProceed(step)}
+                                        disabled={!canProceed(step, values)}
                                         style={{
                                             width: '100%', padding: '14px',
-                                            background: canProceed(step) ? colors.emerald : colors.bgElevated,
-                                            color: canProceed(step) ? colors.bgPage : colors.textMuted,
+                                            background: canProceed(step, values) ? colors.emerald : colors.bgElevated,
+                                            color: canProceed(step, values) ? colors.bgPage : colors.textMuted,
                                             fontSize: '0.76rem', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase',
-                                            border: `0.5px solid ${canProceed(step) ? colors.emeraldBorder : colors.borderSubtle}`,
-                                            borderRadius: 10, cursor: canProceed(step) ? 'pointer' : 'not-allowed',
+                                            border: `0.5px solid ${canProceed(step, values) ? colors.emeraldBorder : colors.borderSubtle}`,
+                                            borderRadius: 10, cursor: canProceed(step, values) ? 'pointer' : 'not-allowed',
                                             transition: 'all 0.18s',
                                         }}
-                                        onMouseEnter={e => { if (canProceed(step)) (e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight; }}
-                                        onMouseLeave={e => { if (canProceed(step)) (e.currentTarget as HTMLButtonElement).style.background = colors.emerald; }}
+                                        onMouseEnter={e => { if (canProceed(step, values)) (e.currentTarget as HTMLButtonElement).style.background = colors.emeraldLight; }}
+                                        onMouseLeave={e => { if (canProceed(step, values)) (e.currentTarget as HTMLButtonElement).style.background = colors.emerald; }}
                                     >
                                         {current === STEPS.length - 1 ? 'Build My Plan →' : 'Continue →'}
                                     </button>
