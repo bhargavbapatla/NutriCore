@@ -7,6 +7,8 @@ import {
   Send, Sparkles, Plus,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { logout } from '@/api/authentication';
+import useAuthStore from '@/store/authStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -151,6 +153,7 @@ const Dashboard: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { logoutStack } = useAuthStore();
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -178,6 +181,10 @@ const Dashboard: React.FC = () => {
   };
 
   const sidebarW = collapsed ? 62 : 216;
+
+  const handleLogout = async () => {
+    await logoutStack();
+  };
 
   return (
     <div style={{
@@ -318,7 +325,7 @@ const Dashboard: React.FC = () => {
         <div style={{ padding: '0.6rem', borderTop: `0.5px solid ${colors.borderSubtle}` }}>
           <button
             className="nav-btn logout-btn"
-            onClick={() => { localStorage.removeItem('isAuthenticated'); window.location.href = '/login'; }}
+            onClick={() => { handleLogout() }}
             title={collapsed ? 'Log out' : undefined}
             style={{
               display: 'flex', alignItems: 'center',

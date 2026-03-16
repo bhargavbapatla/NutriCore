@@ -3,281 +3,270 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Activity, Lock, Mail, User } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'sonner';
+import { useFormik, FormikProvider, Field } from 'formik';
+import * as Yup from 'yup';
+import useAuthStore from '../store/authStore';
 
+// ─── Reusable field wrapper ────────────────────────────────────────────────────
+// Separates the input+icon row from the error message so the icon never
+// gets pushed out of center when validation text appears below.
+const InputField: React.FC<{
+    name: string;
+    type: string;
+    placeholder: string;
+    icon: React.ReactNode;
+    label: string;
+    isFocused: boolean;
+    onFocus: () => void;
+    onBlur: (e: React.FocusEvent) => void;
+    colors: any;
+    extraStyle?: React.CSSProperties;
+}> = ({ name, type, placeholder, icon, label, isFocused, onFocus, onBlur, colors, extraStyle }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <label style={{
+            fontSize: '0.62rem', fontWeight: 700,
+            color: colors.textMuted, textTransform: 'uppercase',
+            letterSpacing: '0.18em', paddingLeft: 2,
+            fontFamily: "'DM Mono', monospace",
+        }}>
+            {label}
+        </label>
+        <Field name={name}>
+            {({ field, meta }: any) => (
+                <>
+                    {/* ── Input row — icon always centers against THIS div only ── */}
+                    <div style={{ position: 'relative' }}>
+                        <div style={{
+                            position: 'absolute',
+                            left: 14,
+                            top: '50%',                    // ← always 50% of the input row height
+                            transform: 'translateY(-50%)', // ← never affected by error text below
+                            color: isFocused ? colors.emerald : (meta.touched && meta.error ? colors.danger : colors.textMuted),
+                            transition: 'color 0.2s',
+                            display: 'flex',
+                            pointerEvents: 'none',
+                        }}>
+                            {icon}
+                        </div>
+                        <input
+                            {...field}
+                            type={type}
+                            placeholder={placeholder}
+                            onFocus={onFocus}
+                            onBlur={(e) => { field.onBlur(e); onBlur(e); }}
+                            style={{
+                                width: '100%',
+                                padding: '13px 14px 13px 42px',
+                                background: colors.bgElevated,
+                                border: `0.5px solid ${meta.touched && meta.error
+                                        ? colors.danger
+                                        : isFocused
+                                            ? colors.emeraldBorder
+                                            : colors.borderDefault
+                                    }`,
+                                borderRadius: 10,
+                                color: colors.textPrimary,
+                                fontSize: '0.88rem',
+                                outline: 'none',
+                                transition: 'border-color 0.2s',
+                                fontFamily: "'DM Sans', sans-serif",
+                                boxSizing: 'border-box' as const,
+                                ...extraStyle,
+                            }}
+                        />
+                    </div>
+                    {/* ── Error lives outside the relative container ── */}
+                    {meta.touched && meta.error && (
+                        <div style={{
+                            color: colors.danger,
+                            fontSize: '0.65rem',
+                            fontWeight: 500,
+                            marginTop: -2,
+                            paddingLeft: 2,
+                        }}>
+                            {meta.error}
+                        </div>
+                    )}
+                </>
+            )}
+        </Field>
+    </div>
+);
+
+// ─── Signup ───────────────────────────────────────────────────────────────────
 const Signup: React.FC = () => {
     const { colors } = useTheme();
     const navigate = useNavigate();
+    const { signupStack, isLoading } = useAuthStore();
 
-    // Form Data State
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
-
-    // Focus States for UI Highlighting
     const [nameFocus, setNameFocus] = useState(false);
     const [emailFocus, setEmailFocus] = useState(false);
     const [passFocus, setPassFocus] = useState(false);
     const [confirmFocus, setConfirmFocus] = useState(false);
 
-    const handleSignup = (e: React.FormEvent) => {
-        e.preventDefault();
-        // Simulate signup
-        localStorage.setItem('isAuthenticated', 'true');
-        navigate('/questionnaire');
-    };
+    const validationSchema = Yup.object().shape({
+        name: Yup.string().required('Name is required'),
+        email: Yup.string().email('Invalid email').required('Email is required'),
+        password: Yup.string().min(7, 'Min 7 characters').max(72, 'Too long').required('Password is required'),
+        confirmPassword: Yup.string().oneOf([Yup.ref('password')], 'Passwords must match').required('Please confirm your password'),
+    });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
+    const formik = useFormik({
+        initialValues: { name: '', email: '', password: '', confirmPassword: '' },
+        validationSchema,
+        onSubmit: async (values) => {
+            try {
+                const { confirmPassword, ...signupData } = values;
+                await signupStack(signupData);
+                toast.success('Account created successfully!');
+                navigate('/questionnaire');
+            } catch (err: any) {
+                let msg = 'Failed to create account.';
+                if (err.detail) {
+                    msg = Array.isArray(err.detail) ? err.detail.map((e: any) => e.msg).join(', ') : err.detail;
+                } else if (err.message) msg = err.message;
+                toast.error('Signup Failed', { description: msg });
+            }
+        },
+    });
 
     return (
         <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
-            overflow: 'hidden',
-            backgroundColor: colors.bgPage,
+            minHeight: '100vh', display: 'flex', flexDirection: 'column',
+            position: 'relative', overflow: 'hidden',
+            backgroundColor: colors.bgPage, color: colors.textPrimary,
             fontFamily: "'DM Sans', sans-serif",
-            color: colors.textPrimary
         }}>
+            <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,700;9..40,900&family=DM+Mono:wght@400;500&display=swap');
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-box-shadow: 0 0 0 30px ${colors.bgElevated} inset !important;
+          -webkit-text-fill-color: ${colors.textPrimary} !important;
+        }
+        .return-link:hover { color: ${colors.emerald} !important; }
+        .login-link:hover  { color: ${colors.emeraldLight} !important; }
+      `}</style>
 
-            {/* --- INJECTED CSS FOR AUTOFILL RESET --- */}
-            <style>
-                {`
-          /* Input reset to prevent browser autofill styling from breaking the dark theme */
-          input:-webkit-autofill,
-          input:-webkit-autofill:hover, 
-          input:-webkit-autofill:focus, 
-          input:-webkit-autofill:active{
-              -webkit-box-shadow: 0 0 0 30px ${colors.bgPage} inset !important;
-              -webkit-text-fill-color: ${colors.textPrimary} !important;
-              border-radius: 8px !important;
-          }
-        `}
-            </style>
-
-            {/* --- AMBIENT BACKGROUND GLOW --- */}
-            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ position: 'absolute', top: '10%', right: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.danger}0a`, filter: 'blur(100px)' }} />
-                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: '600px', height: '600px', borderRadius: '50%', backgroundColor: `${colors.emerald}0a`, filter: 'blur(100px)' }} />
+            {/* Ambient */}
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+                <div style={{ position: 'absolute', top: '10%', right: '10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(244,63,94,0.05) 0%, transparent 70%)' }} />
+                <div style={{ position: 'absolute', bottom: '10%', left: '10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%)' }} />
+                <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(${colors.borderSubtle} 1px, transparent 1px), linear-gradient(90deg, ${colors.borderSubtle} 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
             </div>
 
-            {/* --- NEURAL CIRCUITS --- */}
+            {/* Circuit lines */}
             <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-                <svg style={{ width: '100%', height: '100%', opacity: 0.6 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+                <svg style={{ width: '100%', height: '100%', opacity: 0.5 }} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
                     <defs>
-                        <linearGradient id="glowLeft" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.emerald} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                        <linearGradient id="sgGlowE" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="transparent" />
+                            <stop offset="20%" stopColor={colors.emerald} stopOpacity="0.7" />
+                            <stop offset="100%" stopColor="transparent" />
                         </linearGradient>
-                        <linearGradient id="glowRight" x1="100%" y1="0%" x2="0%" y2="0%">
-                            <stop offset="0%" stopColor="transparent" /><stop offset="20%" stopColor={colors.danger} stopOpacity="0.8" /><stop offset="100%" stopColor="transparent" />
+                        <linearGradient id="sgGlowD" x1="100%" y1="0%" x2="0%" y2="0%">
+                            <stop offset="0%" stopColor="transparent" />
+                            <stop offset="20%" stopColor={colors.danger} stopOpacity="0.6" />
+                            <stop offset="100%" stopColor="transparent" />
                         </linearGradient>
                     </defs>
-
-                    <motion.path d="M -50 200 C 200 200, 400 450, 720 450" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-                    <motion.path d="M -50 750 C 300 750, 500 550, 720 550" fill="transparent" stroke="url(#glowLeft)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }} />
-                    <motion.path d="M 1490 150 C 1200 150, 1000 450, 720 450" fill="transparent" stroke="url(#glowRight)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} />
-                    <motion.path d="M 1490 800 C 1100 800, 900 550, 720 550" fill="transparent" stroke="url(#glowRight)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.6, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 2 }} />
+                    <motion.path d="M -50 200 C 200 200, 400 450, 720 450" fill="transparent" stroke="url(#sgGlowE)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }} />
+                    <motion.path d="M -50 750 C 300 750, 500 550, 720 550" fill="transparent" stroke="url(#sgGlowE)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }} />
+                    <motion.path d="M 1490 150 C 1200 150, 1000 450, 720 450" fill="transparent" stroke="url(#sgGlowD)" strokeWidth="1.5" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 1, 0] }} transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }} />
+                    <motion.path d="M 1490 800 C 1100 800, 900 550, 720 550" fill="transparent" stroke="url(#sgGlowD)" strokeWidth="1" strokeLinecap="round" animate={{ pathLength: [0, 1], opacity: [0, 0.5, 0] }} transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 2 }} />
                 </svg>
             </div>
 
-            {/* --- HEADER --- */}
-            <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '2rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 900, fontSize: '1.25rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em' }}>
-                    <Activity size={24} color={colors.emerald} />
+            {/* Header */}
+            <header style={{ position: 'relative', zIndex: 10, width: '100%', padding: '1.75rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 9, fontWeight: 900, fontSize: '1.05rem', color: colors.textPrimary, fontFamily: "'DM Mono', monospace", letterSpacing: '0.08em' }}>
+                    <Activity size={20} color={colors.emerald} />
                     NUTRICORE
                 </div>
-                <Link to="/" style={{ textDecoration: 'none', fontSize: '0.75rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em', transition: 'color 0.3s' }}>
+                <Link to="/" className="return-link" style={{ textDecoration: 'none', fontSize: '0.68rem', fontWeight: 700, color: colors.textMuted, textTransform: 'uppercase', letterSpacing: '0.15em', transition: 'color 0.2s' }}>
                     Return Home
                 </Link>
             </header>
 
-            {/* --- SIGNUP TERMINAL --- */}
+            {/* Card */}
             <main style={{ position: 'relative', zIndex: 10, flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 28 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
                     style={{
-                        width: '100%',
-                        maxWidth: '520px',
-                        padding: '3.5rem',
-                        backgroundColor: colors.bgCard,
-                        borderRadius: '16px',
-                        border: `1px solid ${colors.borderDefault}`,
+                        width: '100%', maxWidth: 520,
+                        padding: '2.75rem',
+                        background: colors.bgCard,
+                        borderRadius: 20,
+                        border: `0.5px solid ${colors.borderDefault}`,
                         backdropFilter: 'blur(24px)',
                         WebkitBackdropFilter: 'blur(24px)',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '2.5rem'
+                        display: 'flex', flexDirection: 'column', gap: '2rem',
+                        position: 'relative', overflow: 'hidden',
                     }}
                 >
-                    {/* Titles */}
-                    <div style={{ textAlign: 'center' }}>
-                        <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: colors.textPrimary }}>
-                            Create an Account
+                    {/* Card glow */}
+                    <div style={{ position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)', width: '70%', height: 120, background: 'radial-gradient(ellipse, rgba(16,185,129,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+                    {/* Title */}
+                    <div style={{ textAlign: 'center', position: 'relative' }}>
+                        <h1 style={{ fontSize: '1.75rem', fontWeight: 900, margin: '0 0 0.4rem', letterSpacing: '-0.03em', color: colors.textPrimary }}>
+                            Create an account
                         </h1>
-                        <p style={{ fontSize: '0.9rem', color: colors.textMuted, margin: 0 }}>
-                            Set up your professional profile to continue.
+                        <p style={{ fontSize: '0.85rem', color: colors.textMuted, margin: 0, lineHeight: 1.6 }}>
+                            Set up your profile to get started.
                         </p>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <FormikProvider value={formik}>
+                        <form onSubmit={formik.handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-                            {/* Name Field */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
-                                    Name
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: nameFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
-                                        <User size={16} />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        required
-                                        placeholder="John Doe"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        onFocus={() => setNameFocus(true)}
-                                        onBlur={() => setNameFocus(false)}
-                                        style={{
-                                            width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${nameFocus ? colors.emeraldBorder : colors.borderSubtle}`,
-                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
-                                        }}
-                                    />
-                                </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.1rem' }}>
+                                <InputField name="name" type="text" placeholder="John Doe" label="Name" icon={<User size={15} />} isFocused={nameFocus} onFocus={() => setNameFocus(true)} onBlur={() => setNameFocus(false)} colors={colors} />
+                                <InputField name="email" type="email" placeholder="you@example.com" label="Email" icon={<Mail size={15} />} isFocused={emailFocus} onFocus={() => setEmailFocus(true)} onBlur={() => setEmailFocus(false)} colors={colors} />
                             </div>
 
-                            {/* Email Field */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
-                                    Email ID
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
-                                        <Mail size={16} />
-                                    </div>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        required
-                                        placeholder="name@company.com"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        onFocus={() => setEmailFocus(true)}
-                                        onBlur={() => setEmailFocus(false)}
-                                        style={{
-                                            width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${emailFocus ? colors.emeraldBorder : colors.borderSubtle}`,
-                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease'
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-                            {/* Password Field */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
-                                    Password
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
-                                        <Lock size={16} />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        required
-                                        placeholder="••••••••"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        onFocus={() => setPassFocus(true)}
-                                        onBlur={() => setPassFocus(false)}
-                                        style={{
-                                            width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${passFocus ? colors.emeraldBorder : colors.borderSubtle}`,
-                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
-                                        }}
-                                    />
-                                </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.1rem' }}>
+                                <InputField name="password" type="password" placeholder="••••••••" label="Password" icon={<Lock size={15} />} isFocused={passFocus} onFocus={() => setPassFocus(true)} onBlur={() => setPassFocus(false)} colors={colors} extraStyle={{ letterSpacing: '0.15em' }} />
+                                <InputField name="confirmPassword" type="password" placeholder="••••••••" label="Confirm Password" icon={<Lock size={15} />} isFocused={confirmFocus} onFocus={() => setConfirmFocus(true)} onBlur={() => setConfirmFocus(false)} colors={colors} extraStyle={{ letterSpacing: '0.15em' }} />
                             </div>
 
-                            {/* Confirm Password Field */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: colors.textMuted, letterSpacing: '0.05em' }}>
-                                    Confirm Password
-                                </label>
-                                <div style={{ position: 'relative' }}>
-                                    <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: confirmFocus ? colors.emerald : colors.textMuted, transition: 'color 0.3s' }}>
-                                        <Lock size={16} />
-                                    </div>
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        required
-                                        placeholder="••••••••"
-                                        value={formData.confirmPassword}
-                                        onChange={handleChange}
-                                        onFocus={() => setConfirmFocus(true)}
-                                        onBlur={() => setConfirmFocus(false)}
-                                        style={{
-                                            width: '100%', boxSizing: 'border-box', padding: '14px 14px 14px 42px',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.03)', border: `1px solid ${confirmFocus ? colors.emeraldBorder : colors.borderSubtle}`,
-                                            borderRadius: '8px', color: colors.textPrimary, fontSize: '0.9rem', outline: 'none', transition: 'all 0.3s ease', letterSpacing: '0.1em'
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                            <motion.button
+                                type="submit"
+                                disabled={isLoading}
+                                whileHover={!isLoading ? { y: -1 } : {}}
+                                whileTap={!isLoading ? { scale: 0.97 } : {}}
+                                transition={{ duration: 0.15 }}
+                                style={{
+                                    marginTop: '0.5rem',
+                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                                    padding: '14px 0', width: '100%', borderRadius: 10,
+                                    background: isLoading ? colors.bgElevated : colors.emerald,
+                                    border: `0.5px solid ${isLoading ? colors.borderDefault : colors.emeraldBorder}`,
+                                    color: isLoading ? colors.textMuted : colors.bgPage,
+                                    fontSize: '0.78rem', fontWeight: 800,
+                                    letterSpacing: '0.16em', textTransform: 'uppercase',
+                                    cursor: isLoading ? 'not-allowed' : 'pointer',
+                                    transition: 'background 0.2s, color 0.2s',
+                                    fontFamily: "'DM Sans', sans-serif",
+                                }}
+                            >
+                                {isLoading ? 'Creating account...' : <><span>Create account</span><ArrowRight size={15} /></>}
+                            </motion.button>
+                        </form>
+                    </FormikProvider>
 
-                        {/* Submit Button */}
-                        <motion.button
-                            type="submit"
-                            style={{
-                                marginTop: '1.5rem',
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                                padding: '16px 0', width: '100%',
-                                borderRadius: '8px',
-                                backgroundColor: colors.emeraldTint, border: `1px solid ${colors.emeraldBorder}`,
-                                color: colors.emerald, fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-                                cursor: 'pointer', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-                                transition: 'all 0.3s ease'
-                            }}
-                            whileHover={{
-                                backgroundColor: colors.emeraldGlow,
-                                borderColor: colors.emerald,
-                                y: -2
-                            }}
-                            transition={{ duration: 0.2 }}
-                        >
-                            Create
-                            <ArrowRight size={18} color={colors.emerald} />
-                        </motion.button>
-                    </form>
-
-                    {/* Footer Link */}
-                    <div style={{ textAlign: 'center', fontSize: '0.85rem', color: colors.textMuted }}>
+                    <div style={{ textAlign: 'center', fontSize: '0.8rem', color: colors.textMuted }}>
                         Already have an account?{' '}
-                        <Link to="/login" style={{ color: colors.emerald, fontWeight: 600, textDecoration: 'none' }}>
+                        <Link to="/login" className="login-link" style={{ color: colors.emerald, fontWeight: 700, textDecoration: 'none', transition: 'color 0.2s' }}>
                             Log in
                         </Link>
                     </div>
-
                 </motion.div>
             </main>
         </div>
