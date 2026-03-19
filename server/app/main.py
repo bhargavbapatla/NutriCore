@@ -32,4 +32,4 @@ async def health_check(db: Session = Depends(get_db)):
         return {"status": "unhealthy", "database": f"Connection failed: {str(e)}"}
 
 
-app.include_router(api_router)
+app.include_router(api_router, prefix="/api")
