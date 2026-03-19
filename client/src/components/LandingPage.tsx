@@ -414,21 +414,21 @@ const LandingPage: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                 <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Platform</h4>
                 {['Dashboard', 'Molecular Agents', 'Analytics'].map(link => (
-                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#fff'} onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#a1a1aa'}>{link}</a>
                 ))}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                 <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Resources</h4>
                 {['API Documentation', 'Protocols', 'Help Center'].map(link => (
-                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#fff'} onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#a1a1aa'}>{link}</a>
                 ))}
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                 <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Company</h4>
                 {['About Us', 'Careers', 'Privacy Policy'].map(link => (
-                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#fff'} onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#a1a1aa'}>{link}</a>
                 ))}
               </div>
 
