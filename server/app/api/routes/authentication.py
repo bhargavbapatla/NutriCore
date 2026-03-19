@@ -7,7 +7,7 @@ from fastapi import Depends, Request
 from fastapi.responses import Response
 from app import models
 from app.api.dependencies import get_user_from_cookie
-
+from app.schemas.users import UserResponseWrapper
 router = APIRouter()
 
 @router.post("/signup")
@@ -58,7 +58,7 @@ async def login(request: UserLogin, response: Response, db: Session = Depends(ge
         "user": user
     }
 
-@router.get("/me")
+@router.get("/me", response_model=UserResponseWrapper)
 async def verify_user(current_user: models.User = Depends(get_user_from_cookie)):
     return {
         "user": current_user

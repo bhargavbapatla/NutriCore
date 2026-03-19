@@ -1,11 +1,12 @@
 import apiClient from './apiClient';
+import { signupUrl, loginUrl, meUrl, logoutUrl } from './urls';
 
 /**
  * Authentication API endpoints
  */
 export const signup = async (userData: any) => {
   try {
-    const response = await apiClient.post('/auth/signup', userData);
+    const response = await apiClient.post(signupUrl, userData);
     return { data: response.data, status: response.status };
   } catch (error: any) {
     throw error.response?.data || error.message || 'An error occurred during signup';
@@ -14,7 +15,7 @@ export const signup = async (userData: any) => {
 
 export const login = async (userData: any) => {
   try {
-    const response = await apiClient.post('/auth/login', userData);
+    const response = await apiClient.post(loginUrl, userData);
     return { data: response.data, status: response.status };
   } catch (error: any) {
     throw error.response?.data || error.message || 'An error occurred during login';
@@ -23,8 +24,8 @@ export const login = async (userData: any) => {
 
 export const getMe = async () => {
   try {
-    const response = await apiClient.get('/auth/me');
-    return response.data;
+    const response = await apiClient.get(meUrl);
+    return { data: response.data, status: response.status };
   } catch (error: any) {
     throw error.response?.data || error.message || 'An error occurred fetching user data';
   }
@@ -32,8 +33,9 @@ export const getMe = async () => {
 
 export const logout = async () => {
   try {
-    await apiClient.post('/auth/logout');
+    const response = await apiClient.post(logoutUrl);
+    return { data: response.data, status: response.status };
   } catch (error: any) {
-    console.error('Logout failed', error);
+    throw error.response?.data || error.message || 'An error occurred during logout';
   }
 };

@@ -1,8 +1,8 @@
-"""create users table
+"""initial user table
 
-Revision ID: 73814ab8048f
-Revises: fc5eac553d48
-Create Date: 2026-03-15 15:52:22.428691
+Revision ID: b2015f0c01ca
+Revises: 
+Create Date: 2026-03-19 16:56:12.676480
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '73814ab8048f'
-down_revision: Union[str, Sequence[str], None] = 'fc5eac553d48'
+revision: str = 'b2015f0c01ca'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -25,11 +25,15 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=True),
-    sa.Column('hashed_password', sa.String(), nullable=True),
+    sa.Column('password', sa.String(), nullable=True),
+    sa.Column('is_questionnaire_complete', sa.Boolean(), nullable=True),
     sa.Column('age', sa.Integer(), nullable=True),
     sa.Column('weight', sa.Float(), nullable=True),
-    sa.Column('goal', sa.String(), nullable=True),
-    sa.Column('activityLevel', sa.String(), nullable=True),
+    sa.Column('sleep_hours', sa.Float(), nullable=True),
+    sa.Column('goal', sa.Integer(), nullable=True),
+    sa.Column('activity_level', sa.Integer(), nullable=True),
+    sa.Column('meals_per_day', sa.Integer(), nullable=True),
+    sa.Column('dietary_restrictions', sa.JSON(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )

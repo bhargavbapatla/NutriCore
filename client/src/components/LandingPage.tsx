@@ -363,19 +363,104 @@ const LandingPage: React.FC = () => {
 
       {/* ── Footer ── */}
       <footer style={{
-        position: 'relative', zIndex: 10, padding: '2.5rem 5%',
-        borderTop: `0.5px solid ${colors.borderSubtle}`,
-        background: `${colors.bgPage}f0`,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem',
+        backgroundColor: 'transparent',
+        padding: '2rem',
       }}>
-        <ECGLogo />
-        <div style={{ display: 'flex', gap: '2.5rem' }}>
-          {['Privacy', 'Terms', 'Contact'].map(l => (
-            <a key={l} href="#" className="footer-link-lp" style={{ color: colors.textMuted, textDecoration: 'none', fontSize: '0.66rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.12em' }}>{l}</a>
-          ))}
-        </div>
-        <div style={{ color: colors.textMuted, fontSize: '0.64rem', letterSpacing: '0.1em', fontFamily: "'DM Mono', monospace" }}>
-          © {new Date().getFullYear()} NutriCore Systems
+        <div style={{
+          backgroundColor: '#0a0d0b',
+          border: '1px solid rgba(16, 185, 129, 0.15)',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: '75vh',
+        }}>
+
+          {/* TOP SECTION: Grid / Flex */}
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            gap: '4rem',
+            padding: '5rem 5% 0 5%',
+            zIndex: 2,
+          }}>
+
+            {/* Left Column: Branding */}
+            <div style={{ maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <span style={{
+                fontSize: '0.65rem',
+                fontFamily: "'DM Mono', monospace",
+                textTransform: 'uppercase',
+                letterSpacing: '0.15em',
+                color: '#10b981'
+              }}>
+                System Active, Protocol Engaged
+              </span>
+              <h2 style={{
+                fontSize: '1.2rem',
+                fontWeight: 400,
+                lineHeight: 1.5,
+                margin: 0,
+                color: '#e4e4e7'
+              }}>
+                Advanced biological optimization. We synchronize your molecular data to engineer the ultimate human experience.
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', gap: '5rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Platform</h4>
+                {['Dashboard', 'Molecular Agents', 'Analytics'].map(link => (
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Resources</h4>
+                {['API Documentation', 'Protocols', 'Help Center'].map(link => (
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <h4 style={{ fontSize: '0.7rem', fontFamily: "'DM Mono', monospace", textTransform: 'uppercase', letterSpacing: '0.1em', color: '#10b981', margin: '0 0 0.5rem 0' }}>Company</h4>
+                {['About Us', 'Careers', 'Privacy Policy'].map(link => (
+                  <a key={link} href="#" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#fff'} onMouseLeave={(e) => e.target.style.color = '#a1a1aa'}>{link}</a>
+                ))}
+              </div>
+
+            </div>
+          </div>
+
+          {/* BOTTOM SECTION: Massive Typography */}
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            marginTop: 'auto',
+            paddingTop: '4rem',
+            overflow: 'hidden'
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(3rem, 13vw, 20rem)',
+              fontWeight: 800,
+              lineHeight: 0.75,
+              letterSpacing: '-0.06em',
+              margin: 0,
+              color: '#f4f4f5',
+              textAlign: 'center',
+              width: '100%',
+              whiteSpace: 'nowrap',
+              userSelect: 'none',
+            }}>
+              NUTRICORE
+            </h1>
+          </div>
+
         </div>
       </footer>
     </div>
