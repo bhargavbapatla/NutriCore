@@ -3,3 +3,4 @@ export const loginUrl = "/api/auth/login";
 export const logoutUrl = "/api/auth/logout";
 export const profileUrl = "/api/profile";
 export const meUrl = "/api/auth/me";
+export const dashboardInitUrl = "/api/dashboard/init";

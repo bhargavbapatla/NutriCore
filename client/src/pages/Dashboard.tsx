@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import {
   LogOut, ChevronLeft, ChevronRight,
   LayoutDashboard, Utensils, Activity,
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import useAuthStore from '@/store/authStore';
+import { streamDashboardInit } from '@/api/dashboard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Message {
@@ -36,13 +38,10 @@ const QUICK_PROMPTS = [
   'Analyse my last bloodwork',
 ];
 
-const SEED_MESSAGES: Message[] = [
-  {
-    id: '1', role: 'agent', agent: 'PlannerAgent',
-    text: "Good morning. I've reviewed your logs from yesterday — your protein was 18g below target and you hit a 420 kcal deficit. Solid progress. Want a high-protein breakfast suggestion that fills your remaining micro gaps for the day?",
-    time: '08:02',
-  },
-];
+const getTime = () => {
+  const now = new Date();
+  return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+};
 
 // ─── ECG Logo ─────────────────────────────────────────────────────────────────
 const ECGLogo: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
@@ -129,7 +128,27 @@ const Bubble: React.FC<{ msg: Message }> = ({ msg }) => {
           padding: '0.8rem 1.1rem',
           fontSize: '0.88rem', color: colors.textPrimary, lineHeight: 1.75,
         }}>
-          {msg.text}
+          {isUser ? msg.text : (
+            <div className="md-bubble">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p style={{ margin: '0 0 0.6em', lineHeight: 1.75 }}>{children}</p>,
+                  strong: ({ children }) => <strong style={{ color: colors.emerald, fontWeight: 700 }}>{children}</strong>,
+                  em: ({ children }) => <em style={{ color: colors.textBody, fontStyle: 'italic' }}>{children}</em>,
+                  ul: ({ children }) => <ul style={{ margin: '0.4em 0', paddingLeft: '1.2em' }}>{children}</ul>,
+                  ol: ({ children }) => <ol style={{ margin: '0.4em 0', paddingLeft: '1.2em' }}>{children}</ol>,
+                  li: ({ children }) => <li style={{ marginBottom: '0.25em' }}>{children}</li>,
+                  h1: ({ children }) => <h1 style={{ fontSize: '1rem', fontWeight: 800, color: colors.textPrimary, margin: '0 0 0.4em' }}>{children}</h1>,
+                  h2: ({ children }) => <h2 style={{ fontSize: '0.92rem', fontWeight: 700, color: colors.textPrimary, margin: '0 0 0.4em' }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ fontSize: '0.88rem', fontWeight: 700, color: colors.emerald, margin: '0 0 0.3em' }}>{children}</h3>,
+                  code: ({ children }) => <code style={{ background: colors.bgCard, border: `0.5px solid ${colors.borderDefault}`, borderRadius: 4, padding: '0.1em 0.4em', fontSize: '0.82em', fontFamily: "'DM Mono', monospace", color: colors.emeraldLight }}>{children}</code>,
+                  blockquote: ({ children }) => <blockquote style={{ borderLeft: `2px solid ${colors.emeraldBorder}`, margin: '0.4em 0', paddingLeft: '0.8em', color: colors.textBody }}>{children}</blockquote>,
+                }}
+              >
+                {msg.text}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
 
         <span style={{
@@ -147,12 +166,43 @@ const Bubble: React.FC<{ msg: Message }> = ({ msg }) => {
 const Dashboard: React.FC = () => {
   const { colors } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(SEED_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { logoutStack } = useAuthStore();
+
+  // Stream AI assessment on mount
+  useEffect(() => {
+    const controller = new AbortController();
+    const messageId = 'init';
+    let started = false;
+
+    setIsTyping(true);
+
+    streamDashboardInit((chunk) => {
+      if (!started) {
+        started = true;
+        setIsTyping(false);
+        setMessages([{
+          id: messageId,
+          role: 'agent',
+          agent: 'PlannerAgent',
+          text: chunk,
+          time: getTime(),
+        }]);
+      } else {
+        setMessages(prev =>
+          prev.map(m => m.id === messageId ? { ...m, text: m.text + chunk } : m)
+        );
+      }
+    }, controller.signal).catch((err) => {
+      if (err.name !== 'AbortError') setIsTyping(false);
+    });
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -160,8 +210,7 @@ const Dashboard: React.FC = () => {
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const time = getTime();
 
     setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', text, time }]);
     setInput('');
@@ -217,6 +266,7 @@ const Dashboard: React.FC = () => {
         .input-wrap:focus-within { border-color: ${colors.emeraldBorder} !important; }
         .logout-btn:hover { color: ${colors.danger} !important; background: ${colors.dangerTint} !important; }
         .daily-log-btn:hover { background: ${colors.emeraldLight} !important; }
+        .md-bubble > *:last-child { margin-bottom: 0 !important; }
       `}</style>
 
       {/* ── Fixed grid overlay ─────────────────────────────────────────────── */}
@@ -412,12 +462,12 @@ const Dashboard: React.FC = () => {
           {/* Message list */}
           <div style={{
             flex: 1, overflowY: 'auto',
-            padding: messages.length <= 1 ? '0' : '2rem 2.5rem',
+            padding: messages.length === 0 && !isTyping ? '0' : '2rem 2.5rem',
             display: 'flex', flexDirection: 'column',
           }}>
 
             {/* ── Welcome state ── */}
-            {messages.length <= 1 && (
+            {messages.length === 0 && !isTyping && (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -485,7 +535,7 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* ── Conversation ── */}
-            {messages.length > 1 && (
+            {(messages.length > 0 || isTyping) && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 {messages.map(msg => (
                   <Bubble key={msg.id} msg={msg} />
@@ -531,7 +581,7 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Quick chips — active conversation only */}
-          {messages.length > 1 && (
+          {messages.length > 0 && (
             <div style={{ padding: '0 2rem 0.6rem', display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {QUICK_PROMPTS.slice(0, 3).map(q => (
                 <button key={q} className="chip"
